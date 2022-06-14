@@ -1,8 +1,11 @@
 package com.infinityraider.miney_games.games.chess;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class ChessBoard {
     private final Square[][] board;
@@ -34,6 +37,21 @@ public class ChessBoard {
 
     public final int getHeight() {
         return this.height;
+    }
+
+    public Stream<Square> streamSquares() {
+        return Arrays.stream(this.board).flatMap(Arrays::stream).filter(Square::isAccessible);
+    }
+
+    public Stream<ChessPiece> streamPieces() {
+        return this.streamSquares()
+                .map(Square::getPiece)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
+    }
+
+    public void foreach(Consumer<Square> consumer) {
+        this.streamSquares().forEach(consumer);
     }
 
     public Optional<Square> getSquare(int x, int y) {

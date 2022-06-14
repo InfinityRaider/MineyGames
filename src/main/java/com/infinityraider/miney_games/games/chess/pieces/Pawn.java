@@ -1,5 +1,6 @@
 package com.infinityraider.miney_games.games.chess.pieces;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.infinityraider.miney_games.games.chess.*;
 
@@ -7,30 +8,32 @@ import java.util.Optional;
 import java.util.Set;
 
 public class Pawn extends ChessPiece.Type {
+    private static final Set<ChessPiece.Type> VALID_PROMOTIONS = ImmutableSet.of(
+            ChessPiece.Pieces.ROOK,
+            ChessPiece.Pieces.KNIGHT,
+            ChessPiece.Pieces.BISHOP,
+            ChessPiece.Pieces.QUEEN
+    );
+
     @Override
     public Set<ChessMove> getPotentialMoves(ChessPiece piece) {
         // initialize moves
         Set<ChessMove> moves = Sets.newIdentityHashSet();
         // fetch useful data
         PlayDirection dir = piece.getDirection();
-        ChessGame game = piece.getGame();
         ChessBoard board = piece.getBoard();
         ChessBoard.Square square = piece.currentSquare();
-        boolean hasMoved = piece.hasMoved();
         // move one up
-        square.offset(board, dir.dx(), dir.dy()).ifPresent(target -> {
-            if(!target.getPiece().isPresent()) {
-
-            }
-        });
+        this.checkSquare(piece, dir.dx(), dir.dy(), false).ifPresent(moves::add);
+        // TODO: promotion
         // move two up on first move
-        if(!hasMoved && this.isHomeRow(board, square, dir)) {
-            square.offset(board, 2*dir.dx(), 2*dir.dy()).ifPresent(moves::add);
+        if(!moves.isEmpty() && !piece.hasMoved() && this.isHomeRow(board, square, dir)) {
+            this.checkSquare(piece, 2*dir.dx(), 2*dir.dy(), false).ifPresent(moves::add);
         }
         // capture diagonal left
-
+        this.capture(piece, true);
         // capture diagonal right
-
+        this.capture(piece, false);
         // return
         return moves;
     }
@@ -41,14 +44,55 @@ public class Pawn extends ChessPiece.Type {
         return singleBack.isPresent() && !doubleBack.isPresent();
     }
 
-    protected boolean canCapture(ChessBoard board, ChessBoard.Square square, ChessColour colour, boolean left) {
-        PlayDirection dir = colour.getDirection();
-        boolean direct = square.offset(board, dir.dx() + (left ? -dir.dy() : dir.dy()), dir.dy() + (left ? -dir.dx() : dir.dx()))
+    protected Optional<ChessMove> capture(ChessPiece pawn, boolean left) {
+        PlayDirection dir = pawn.getDirection();
+        // direct capture
+        Optional<ChessMove> direct = pawn.offset(dir.dx() + (left ? -dir.dy() : dir.dy()), dir.dy() + (left ? -dir.dx() : dir.dx()))
                 .flatMap(ChessBoard.Square::getPiece)
-                .map(piece -> piece.getColour() != colour)
-                .orElse(false);
-        if(direct) {
-            return true;
+                .flatMap(piece -> {
+                    if(piece.getColour() != pawn.getColour()) {
+                        return Optional.of(ChessMove.capture(pawn, piece.currentSquare(), piece));
+                    } else {
+                        return Optional.empty();
+                    }
+                });
+        if(direct.isPresent()) {
+            return direct;
         }
+        // en passant capture: get the piece next to the pawn
+        return pawn.offset(left ? -dir.dy() : dir.dy(), left ? -dir.dx() : dir.dx())
+                .flatMap(ChessBoard.Square::getPiece)
+                .flatMap(piece -> {
+                    // if the piece is not a pawn, return
+                    if(piece.getType() != pawn.getType()) {
+                        return Optional.empty();
+                    }
+                    // if the piece is of the same colour, return
+                    if(piece.getColour() != pawn.getColour()) {
+                        return Optional.empty();
+                    }
+                    // check if the pawn has made a double move last move
+                    return piece.getLastMove().flatMap(move -> {
+                        // check if last move was previous move
+                        boolean isPrevMove = pawn.getGame().getParticipant(piece.getColour()).getLastMove()
+                                .map(last -> last == move)
+                                .orElse(false);
+                        if(isPrevMove) {
+                            ChessBoard.Square from = move.fromSquare();
+                            ChessBoard.Square to = move.toSquare();
+                            int dx = to.getX() - from.getX();
+                            int dy = to.getY() - from.getY();
+                            if ((dx != 0 && dx == 2 * piece.getDirection().dx()) || (dy != 0 && dy == 2 * piece.getDirection().dy())) {
+                                return Optional.of(ChessMove.capture(
+                                        pawn,
+                                        pawn.offset(dir.dx() + (left ? -dir.dy() : dir.dy()), dir.dy() + (left ? -dir.dx() : dir.dx())).orElseThrow(
+                                                () -> new IllegalStateException("Tried to capture en passant to a non existent square")),
+                                        piece
+                                ));
+                            }
+                        }
+                        return Optional.empty();
+                    });
+                });
     }
 }
