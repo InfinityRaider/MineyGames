@@ -32,6 +32,10 @@ public class ChessMove {
         this.captures = captures;
     }
 
+    public Type getType() {
+        return this.type;
+    }
+
     public ChessPiece getPiece() {
         return this.piece;
     }
@@ -112,6 +116,14 @@ public class ChessMove {
     public enum Type {
         MOVE,
         CAPTURE,
-        CASTLE
+        CASTLE;
+
+        public boolean isCapture() {
+            return this == CAPTURE;
+        }
+
+        public boolean isCastle() {
+            return this == CASTLE;
+        }
     }
 }

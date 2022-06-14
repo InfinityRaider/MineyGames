@@ -85,6 +85,8 @@ public class ChessPiece {
     }
 
     public static abstract class Type {
+        protected  abstract boolean canFinishGame();
+
         protected abstract Set<ChessMove> getPotentialMoves(ChessPiece piece);
 
         protected void scanMoves(ChessPiece piece, int dx, int dy, Consumer<ChessMove> consumer) {

@@ -11,6 +11,11 @@ import java.util.Set;
 
 public class King extends ChessPiece.Type {
     @Override
+    protected boolean canFinishGame() {
+        return false;
+    }
+
+    @Override
     public Set<ChessMove> getPotentialMoves(ChessPiece king) {
         // initialize moves
         Set<ChessMove> moves = Sets.newIdentityHashSet();
@@ -32,9 +37,11 @@ public class King extends ChessPiece.Type {
                     .forEach(rook -> {
                         // check if the path between the rook and the king is free
                         if(rook.currentSquare().getX() == king.currentSquare().getX()) {
-
+                            this.checkCastleSquares(king, rook, 0, rook.currentSquare().getY() > king.currentSquare().getY() ? 1 : -1)
+                                    .ifPresent(moves::add);
                         } else if(rook.currentSquare().getY() == king.currentSquare().getY()) {
-
+                            this.checkCastleSquares(king, rook, rook.currentSquare().getX() > king.currentSquare().getX() ? 1 : -1, 0)
+                                    .ifPresent(moves::add);
                         }
                     });
         }

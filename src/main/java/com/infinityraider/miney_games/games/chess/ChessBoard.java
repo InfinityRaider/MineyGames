@@ -113,6 +113,10 @@ public class ChessBoard {
             this.coordinates = buildCoordinates(x, y);
         }
 
+        public boolean isEven() {
+            return (this.getX() + this.getY()) % 2 == 0;
+        }
+
         public int getX() {
             return this.x;
         }

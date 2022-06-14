@@ -8,6 +8,11 @@ import java.util.Set;
 
 public class Knight extends ChessPiece.Type {
     @Override
+    protected boolean canFinishGame() {
+        return false;
+    }
+
+    @Override
     public Set<ChessMove> getPotentialMoves(ChessPiece piece) {
         // initialize moves
         Set<ChessMove> moves = Sets.newIdentityHashSet();

@@ -16,6 +16,11 @@ public class Pawn extends ChessPiece.Type {
     );
 
     @Override
+    protected boolean canFinishGame() {
+        return true;
+    }
+
+    @Override
     public Set<ChessMove> getPotentialMoves(ChessPiece piece) {
         // initialize moves
         Set<ChessMove> moves = Sets.newIdentityHashSet();
@@ -27,13 +32,17 @@ public class Pawn extends ChessPiece.Type {
         this.checkSquare(piece, dir.dx(), dir.dy(), false).ifPresent(moves::add);
         // TODO: promotion
         // move two up on first move
-        if(!moves.isEmpty() && !piece.hasMoved() && this.isHomeRow(board, square, dir)) {
-            this.checkSquare(piece, 2*dir.dx(), 2*dir.dy(), false).ifPresent(moves::add);
+        if (!moves.isEmpty() && !piece.hasMoved() && this.isHomeRow(board, square, dir)) {
+            this.checkSquare(piece, 2 * dir.dx(), 2 * dir.dy(), false).ifPresent(moves::add);
         }
-        // capture diagonal left
-        this.capture(piece, true);
-        // capture diagonal right
-        this.capture(piece, false);
+        // direct capture diagonal left
+        this.captureDirect(piece, true).ifPresent(moves::add);
+        // direct capture diagonal right
+        this.captureDirect(piece, false).ifPresent(moves::add);
+        // en passsant capture diagonal left
+        this.captureEnPassant(piece, true).ifPresent(moves::add);
+        // en passsant capture diagonal left
+        this.captureEnPassant(piece, false).ifPresent(moves::add);
         // return
         return moves;
     }
@@ -44,31 +53,31 @@ public class Pawn extends ChessPiece.Type {
         return singleBack.isPresent() && !doubleBack.isPresent();
     }
 
-    protected Optional<ChessMove> capture(ChessPiece pawn, boolean left) {
+    protected Optional<ChessMove> captureDirect(ChessPiece pawn, boolean left) {
         PlayDirection dir = pawn.getDirection();
-        // direct capture
-        Optional<ChessMove> direct = pawn.offset(dir.dx() + (left ? -dir.dy() : dir.dy()), dir.dy() + (left ? -dir.dx() : dir.dx()))
+        return pawn.offset(dir.dx() + (left ? -dir.dy() : dir.dy()), dir.dy() + (left ? -dir.dx() : dir.dx()))
                 .flatMap(ChessBoard.Square::getPiece)
                 .flatMap(piece -> {
-                    if(piece.getColour() != pawn.getColour()) {
+                    if (piece.getColour() != pawn.getColour()) {
                         return Optional.of(ChessMove.capture(pawn, piece.currentSquare(), piece));
                     } else {
                         return Optional.empty();
                     }
                 });
-        if(direct.isPresent()) {
-            return direct;
-        }
+    }
+
+    protected Optional<ChessMove> captureEnPassant(ChessPiece pawn, boolean left) {
+        PlayDirection dir = pawn.getDirection();
         // en passant capture: get the piece next to the pawn
         return pawn.offset(left ? -dir.dy() : dir.dy(), left ? -dir.dx() : dir.dx())
                 .flatMap(ChessBoard.Square::getPiece)
                 .flatMap(piece -> {
                     // if the piece is not a pawn, return
-                    if(piece.getType() != pawn.getType()) {
+                    if (piece.getType() != pawn.getType()) {
                         return Optional.empty();
                     }
                     // if the piece is of the same colour, return
-                    if(piece.getColour() != pawn.getColour()) {
+                    if (piece.getColour() != pawn.getColour()) {
                         return Optional.empty();
                     }
                     // check if the pawn has made a double move last move
@@ -77,7 +86,7 @@ public class Pawn extends ChessPiece.Type {
                         boolean isPrevMove = pawn.getGame().getParticipant(piece.getColour()).getLastMove()
                                 .map(last -> last == move)
                                 .orElse(false);
-                        if(isPrevMove) {
+                        if (isPrevMove) {
                             ChessBoard.Square from = move.fromSquare();
                             ChessBoard.Square to = move.toSquare();
                             int dx = to.getX() - from.getX();

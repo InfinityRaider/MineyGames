@@ -12,6 +12,8 @@ public interface IChessGameSettings {
 
     BiFunction<Integer, Integer, ChessBoard.Square> boardInitializer();
 
+    ChessClock createChessClock();
+
     List<ChessColour> participants();
 
     ChessPiece pieceSetup(ChessGame game, ChessBoard.Square square);
@@ -32,6 +34,11 @@ public interface IChessGameSettings {
         @Override
         public BiFunction<Integer, Integer, ChessBoard.Square> boardInitializer() {
             return ChessBoard.Square::new;
+        }
+
+        @Override
+        public ChessClock createChessClock() {
+            return null;
         }
 
         @Override
