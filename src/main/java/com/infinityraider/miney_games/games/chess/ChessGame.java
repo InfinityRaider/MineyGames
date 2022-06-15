@@ -31,6 +31,7 @@ public class ChessGame {
         this.board = new ChessBoard(settings.boardInitializer(), settings.boardWidth(), settings.boardHeight());
         this.participants = settings.participants().stream().map(colour -> new Participant(this,  settings.createChessClock(), colour)).collect(Collectors.toList());
         this.turns = Lists.newArrayList();
+        this.getBoard().forEach(square -> settings.pieceSetup(this, square));
     }
 
     public ChessGameStatus getStatus() {
@@ -77,8 +78,10 @@ public class ChessGame {
     }
 
     protected void makeMove(ChessMove move) {
-        // make the move from the participant
-        this.getCurrentParticipant().makeMove(move);
+        // execute the move
+        move.execute();
+        // notify the participant the move has been made
+        this.getCurrentParticipant().onMoveMade(move);
         // update the move and turn history
         this.currentMoves.add(move);
         if(currentMoves.size() == participants.size()) {
@@ -150,7 +153,7 @@ public class ChessGame {
             this.getClock().start();
         }
 
-        private void makeMove(ChessMove move) {
+        private void onMoveMade(ChessMove move) {
             this.getClock().stop();
             this.moves.add(move);
             this.potentialMoves.clear();
@@ -193,9 +196,12 @@ public class ChessGame {
                     .filter(piece -> piece.getColour() == this.getColour())
                     .map(ChessPiece::getPotentialMoves)
                     .flatMap(Collection::stream)
-                    // TODO: filter for moves that result in, or do not break checks
                     .filter(move -> {
-                        return true;
+                        // simulate the move to check if a check is occurring
+                        move.execute();
+                        boolean check = this.isKingAttacked();
+                        move.undo();
+                        return !check;
                     })
                     .forEach(this.potentialMoves::add);
             if(this.getPotentialMoves().isEmpty()) {

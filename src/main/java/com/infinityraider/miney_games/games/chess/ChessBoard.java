@@ -50,8 +50,16 @@ public class ChessBoard {
                 .map(Optional::get);
     }
 
-    public void foreach(Consumer<Square> consumer) {
+    public void forEach(Consumer<Square> consumer) {
         this.streamSquares().forEach(consumer);
+    }
+
+    public void performMove(ChessMove move) {
+
+    }
+
+    public void undoMove(ChessMove move) {
+
     }
 
     public Optional<Square> getSquare(int x, int y) {

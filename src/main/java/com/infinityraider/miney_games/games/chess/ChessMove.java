@@ -32,6 +32,20 @@ public class ChessMove {
         this.captures = captures;
     }
 
+    public void execute() {
+        this.captures.forEach(Capture::execute);
+        this.fromSquare().removePiece();
+        this.toSquare().setPiece(this.getPiece());
+        this.getPiece().onMove(this);
+    }
+
+    public void undo() {
+        this.toSquare().removePiece();
+        this.fromSquare().setPiece(this.getPiece());
+        this.captures.forEach(Capture::undo);
+        this.getPiece().undoMove(this);
+    }
+
     public Type getType() {
         return this.type;
     }
@@ -68,6 +82,17 @@ public class ChessMove {
         public ChessBoard.Square getSquare() {
             return this.square;
         }
+
+        private void execute() {
+            this.getSquare().removePiece();
+            this.getPiece().setCaptured(true);
+        }
+
+        private void undo() {
+            this.getSquare().setPiece(this.getPiece());
+            this.getPiece().setCaptured(false);
+            this.getPiece().setSquare(this.getSquare());
+        }
     }
 
     protected static class Castle extends ChessMove {
@@ -80,6 +105,52 @@ public class ChessMove {
             this.rook = rook;
             this.rookFromSquare = rook.currentSquare();
             this.rookToSquare = getNewRookSquare(king, rook);
+        }
+
+        @Override
+        public void execute() {
+            this.kingToSquare().setPiece(this.getKing());
+            this.kingFromSquare().removePiece();
+            this.rookToSquare().setPiece(this.getRook());
+            this.rookFromSquare().removePiece();
+            this.getKing().onMove(this);
+            this.getRook().onMove(this);
+            this.getRook().setSquare(this.rookToSquare());
+        }
+
+        @Override
+        public void undo() {
+            this.getRook().undoMove(this);
+            this.getKing().undoMove(this);
+            this.rookFromSquare().setPiece(this.getRook());
+            this.rookToSquare().removePiece();
+            this.kingFromSquare().setPiece(this.getKing());
+            this.kingToSquare().removePiece();
+            this.getRook().setSquare(this.rookFromSquare());
+        }
+
+        public ChessPiece getKing() {
+            return this.getPiece();
+        }
+
+        public ChessBoard.Square kingFromSquare() {
+            return this.fromSquare();
+        }
+
+        public ChessBoard.Square kingToSquare() {
+            return this.toSquare();
+        }
+
+        public ChessPiece getRook() {
+            return this.rook;
+        }
+
+        public ChessBoard.Square rookFromSquare() {
+            return this.rookFromSquare;
+        }
+
+        public ChessBoard.Square rookToSquare() {
+            return this.rookToSquare;
         }
 
         private static ChessBoard.Square getNewKingSquare(ChessPiece king, ChessPiece rook) {

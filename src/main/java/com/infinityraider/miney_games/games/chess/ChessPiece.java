@@ -84,6 +84,25 @@ public class ChessPiece {
         return this.getType().getPotentialMoves(this);
     }
 
+    void onMove(ChessMove move) {
+        this.moves.add(move);
+        this.square = move.toSquare();
+    }
+
+    void undoMove(ChessMove move) {
+        this.moves.remove(move);
+        this.square = move.fromSquare();
+    }
+
+    void setCaptured(boolean captured) {
+        this.isCaptured = captured;
+        this.square = ChessBoard.Square.CAPTURED;
+    }
+
+    protected void setSquare(ChessBoard.Square square) {
+        this.square = square;
+    }
+
     public static abstract class Type {
         protected  abstract boolean canFinishGame();
 
