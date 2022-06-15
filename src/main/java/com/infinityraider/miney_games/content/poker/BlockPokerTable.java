@@ -1,38 +1,29 @@
 package com.infinityraider.miney_games.content.poker;
 
-import com.infinityraider.infinitylib.block.BlockBaseTile;
-import com.infinityraider.infinitylib.block.property.InfProperty;
-import com.infinityraider.infinitylib.block.property.InfPropertyConfiguration;
-import com.infinityraider.miney_games.content.chess.TileChessTable;
+import com.google.common.collect.ImmutableList;
+import com.infinityraider.miney_games.core.BlockMineyGame;
+import com.infinityraider.miney_games.core.MineyGameSize;
 import com.infinityraider.miney_games.reference.Names;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.function.BiFunction;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class BlockPokerTable extends BlockBaseTile<TilePokerTable> {
-    public static final int MAX_SIZE = 2;
-
-    public static final InfProperty<Integer> SIZE = InfProperty.Creators.create("size", 1, 2, MAX_SIZE);
-    public static final InfProperty<Integer> X = InfProperty.Creators.create("x", 0, 0, 3);
-    public static final InfProperty<Integer> Y = InfProperty.Creators.create("y", 0, 0, 7);
-    public static final InfProperty<Direction> ORIENTATION = InfProperty.Creators.createHorizontals("orientation", Direction.NORTH);
-
-    private static final InfPropertyConfiguration PROPERTIES = InfPropertyConfiguration.builder()
-            .add(SIZE)
-            .add(X)
-            .add(Y)
-            .add(ORIENTATION)
-            .build();
+public class BlockPokerTable extends BlockMineyGame<TilePokerTable> {
+    public static final List<MineyGameSize> SIZES = ImmutableList.of(
+            new MineyGameSize(2, 4),
+            new MineyGameSize(3, 6)
+    );
 
     private static final BiFunction<BlockPos, BlockState, TilePokerTable> TILE_FACTORY = TilePokerTable::new;
-
 
     public BlockPokerTable() {
         super(Names.POKER_TABLE, Properties.of(Material.WOOD)
@@ -41,12 +32,17 @@ public class BlockPokerTable extends BlockBaseTile<TilePokerTable> {
     }
 
     @Override
-    protected InfPropertyConfiguration getPropertyConfiguration() {
-        return PROPERTIES;
+    protected List<MineyGameSize> getAllSizes() {
+        return SIZES;
     }
 
     @Override
     public BiFunction<BlockPos, BlockState, TilePokerTable> getTileEntityFactory() {
         return TILE_FACTORY;
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState state) {
+        return Shapes.block();
     }
 }

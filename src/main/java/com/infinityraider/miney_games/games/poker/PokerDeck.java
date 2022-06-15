@@ -28,7 +28,7 @@ public class PokerDeck {
     public PokerDeck shuffle() {
         this.drawn.clear();
         this.drawnAccess = ImmutableList.of();
-        
+
         List<PokerCard> cards = new ArrayList<>(this.allCards());
         Collections.shuffle(cards);
         this.deck = new ArrayDeque<>(cards);

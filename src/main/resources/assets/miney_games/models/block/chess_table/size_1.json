@@ -1,0 +1,48 @@
+{
+	"textures": {
+		"1": "minecraft:block/quartz_pillar",
+		"2": "minecraft:block/quartz_pillar_top",
+		"3": "minecraft:block/quartz_block_side",
+		"4": "miney_games:block/chess_table",
+		"particle": "minecraft:block/quartz_block_bottom"
+	},
+	"elements": [
+		{
+			"name": "base",
+			"from": [2, 0, 2],
+			"to": [14, 2, 14],
+			"faces": {
+				"north": {"uv": [2, 14, 14, 16], "texture": "#1"},
+				"east": {"uv": [2, 14, 14, 16], "texture": "#1"},
+				"south": {"uv": [2, 14, 14, 16], "texture": "#1"},
+				"west": {"uv": [2, 14, 14, 16], "texture": "#1"},
+				"up": {"uv": [2, 2, 14, 14], "texture": "#2"},
+				"down": {"uv": [2, 2, 14, 14], "texture": "#2"}
+			}
+		},
+		{
+			"name": "pillar",
+			"from": [5, 2, 5],
+			"to": [11, 8, 11],
+			"faces": {
+				"north": {"uv": [5, 8, 11, 14], "texture": "#1"},
+				"east": {"uv": [5, 8, 11, 14], "texture": "#1"},
+				"south": {"uv": [5, 8, 11, 14], "texture": "#1"},
+				"west": {"uv": [5, 8, 11, 14], "texture": "#1"}
+			}
+		},
+		{
+			"name": "table",
+			"from": [0, 8, 0],
+			"to": [16, 12, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 4], "texture": "#3"},
+				"east": {"uv": [0, 0, 16, 4], "texture": "#3"},
+				"south": {"uv": [0, 0, 16, 4], "texture": "#3"},
+				"west": {"uv": [0, 0, 16, 4], "texture": "#3"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#4"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#2"}
+			}
+		}
+	]
+}
