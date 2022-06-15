@@ -3,7 +3,7 @@ package com.infinityraider.miney_games;
 import com.infinityraider.infinitylib.InfinityMod;
 import com.infinityraider.infinitylib.utility.registration.ModContentRegistry;
 import com.infinityraider.miney_games.config.Config;
-import com.infinityraider.miney_games.content.ModContent;
+import com.infinityraider.miney_games.content.*;
 import com.infinityraider.miney_games.proxy.ClientProxy;
 import com.infinityraider.miney_games.proxy.IProxy;
 import com.infinityraider.miney_games.proxy.ServerProxy;
@@ -40,16 +40,16 @@ public class MineyGames extends InfinityMod<IProxy, Config> {
 
     @Override
     public ModContentRegistry getModBlockRegistry() {
-        return ModContent.getInstance();
+        return ModBlocks.getInstance();
     }
 
     @Override
     public ModContentRegistry getModItemRegistry() {
-        return ModContent.getInstance();
+        return ModItems.getInstance();
     }
 
     @Override
     public ModContentRegistry getModTileRegistry() {
-        return ModContent.getInstance();
+        return ModTiles.getInstance();
     }
 }

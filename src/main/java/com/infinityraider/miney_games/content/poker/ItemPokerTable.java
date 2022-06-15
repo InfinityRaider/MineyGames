@@ -1,4 +1,4 @@
-package com.infinityraider.miney_games.content.chess;
+package com.infinityraider.miney_games.content.poker;
 
 import com.infinityraider.infinitylib.item.BlockItemBase;
 import com.infinityraider.miney_games.content.ModBlocks;
@@ -9,9 +9,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class ItemChessTable extends BlockItemBase {
-    public ItemChessTable() {
-        super(ModBlocks.getInstance().CHESS_TABLE_BLOCK.get(), new Properties()
+public class ItemPokerTable extends BlockItemBase {
+    public ItemPokerTable() {
+        super(ModBlocks.getInstance().POKER_TABLE_BLOCK.get(), new Properties()
                 .tab(CreativeModeTab.TAB_DECORATIONS)
                 .stacksTo(64)
         );

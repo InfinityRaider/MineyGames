@@ -1,8 +1,8 @@
-package com.infinityraider.miney_games.content.chess;
+package com.infinityraider.miney_games.content.poker;
 
 import com.infinityraider.infinitylib.block.tile.InfinityTileEntityType;
 import com.infinityraider.infinitylib.block.tile.TileEntityBase;
-import com.infinityraider.miney_games.client.render.ChessTableRenderer;
+import com.infinityraider.miney_games.client.render.PokerTableRenderer;
 import com.infinityraider.miney_games.content.ModTiles;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -17,9 +17,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class TileChessTable extends TileEntityBase {
-    public TileChessTable(BlockPos pos, BlockState state) {
-        super(ModTiles.getInstance().CHESS_TABLE_TILE.get(), pos, state);
+public class TilePokerTable extends TileEntityBase {
+    public TilePokerTable(BlockPos pos, BlockState state) {
+        super(ModTiles.getInstance().POKER_TABLE_TILE.get(), pos, state);
     }
 
     @Override
@@ -37,15 +37,15 @@ public class TileChessTable extends TileEntityBase {
 
     }
 
-    public static RenderFactory createRenderFactory() {
-        return new RenderFactory();
+    public static TilePokerTable.RenderFactory createRenderFactory() {
+        return new TilePokerTable.RenderFactory();
     }
 
-    private static class RenderFactory implements InfinityTileEntityType.IRenderFactory<TileChessTable> {
+    private static class RenderFactory implements InfinityTileEntityType.IRenderFactory<TilePokerTable> {
         @Nullable
         @OnlyIn(Dist.CLIENT)
-        public ChessTableRenderer createRenderer() {
-            return new ChessTableRenderer();
+        public PokerTableRenderer createRenderer() {
+            return new PokerTableRenderer();
         }
     }
 }
