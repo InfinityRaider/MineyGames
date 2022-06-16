@@ -52,9 +52,9 @@ public class BlockChessTable extends BlockMineyGame<TileChessTable> {
         MineyGameSize size = this.getSize(state);
         return switch (size.getWidth()) {
             case 1 -> HitBoxes.getSize1Shape();
-            case 2 -> HitBoxes.getSize2Shape(this.getX(state), this.getY(state));
-            case 3 -> HitBoxes.getSize3Shape(this.getX(state), this.getY(state));
-            case 4 -> HitBoxes.getSize4Shape(this.getX(state), this.getY(state));
+            case 2 -> HitBoxes.getSize2Shape(this.getRelX(state), this.getRelY(state));
+            case 3 -> HitBoxes.getSize3Shape(this.getRelX(state), this.getRelY(state));
+            case 4 -> HitBoxes.getSize4Shape(this.getRelX(state), this.getRelY(state));
             default -> Shapes.block();
         };
     }
