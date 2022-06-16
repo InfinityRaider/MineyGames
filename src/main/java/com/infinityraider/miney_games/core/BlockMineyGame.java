@@ -7,9 +7,13 @@ import com.infinityraider.infinitylib.block.tile.TileEntityBase;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,6 +21,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
@@ -46,6 +51,14 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
 
     public MineyGameSize getSize(BlockState state) {
         return this.getAllSizes().get(this.getProps().getSizeIndex(state));
+    }
+
+    public BlockState setSize(BlockState state, MineyGameSize size) {
+        int index = this.getAllSizes().indexOf(size);
+        if(index < 0) {
+            return state;
+        }
+        return this.getProps().setSizeIndex(state, index);
     }
 
     public int getWidth(BlockState state) {
@@ -79,14 +92,27 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
     }
 
     public int getAbsX(BlockState state) {
-        return this.getOrientation(state).xRelToAbs(this.getRelX(state), this.getRelY(state));
+        MineyGameSize size = this.getSize(state);
+        return this.getOrientation(state).xRelToAbs(this.getRelX(state), this.getRelY(state), size.getWidth(), size.getDepth());
     }
 
     public int getAbsY(BlockState state) {
-        return this.getOrientation(state).yRelToAbs(this.getRelX(state), this.getRelY(state));
+        MineyGameSize size = this.getSize(state);
+        return this.getOrientation(state).yRelToAbs(this.getRelX(state), this.getRelY(state), size.getWidth(), size.getDepth());
+    }
+
+    public BlockState setAbsCoordinates(BlockState state, int xAbs, int yAbs) {
+        Orientation orientation = this.getOrientation(state);
+        MineyGameSize size = this.getSize(state);
+        state = this.getProps().setX(state, orientation.xAbsToRel(xAbs, yAbs, size.getWidth(), size.getDepth()));
+        return this.getProps().setY(state, orientation.yAbsToRel(xAbs, yAbs, size.getWidth(), size.getDepth()));
     }
 
     public BlockState setOrientation(BlockState state, Direction orientation) {
+        return this.props.setOrientation(state, orientation);
+    }
+
+    public BlockState setOrientation(BlockState state, Orientation orientation) {
         return this.props.setOrientation(state, orientation);
     }
 
@@ -96,6 +122,31 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
 
     public Orientation getOrientation(BlockState state) {
         return this.props.getOrientation(state);
+    }
+
+    @Override
+    @Nullable
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.setOrientation(this.defaultBlockState(), context.getHorizontalDirection());
+    }
+
+    @Override
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        if(!world.isClientSide()) {
+            new MultiBlockFormer(world, pos, this, this.getOrientation(state)).tryFormMultiBlock();
+        }
+    }
+
+    @Override
+    public void destroy(LevelAccessor world, BlockPos pos, BlockState state) {
+        super.destroy(world, pos, state);
+        if(!world.isClientSide()) {
+            Orientation orientation = this.getOrientation(state);
+            BlockState reverted = this.setOrientation(this.defaultBlockState(), orientation);
+            this.getSize(state).stream(pos.offset(-this.getAbsX(state), 0, -this.getAbsY(state)), orientation)
+                    .filter(p -> !p.equals(pos))
+                    .forEach(p -> world.setBlock(p, reverted, 3));
+        }
     }
 
     public abstract VoxelShape getShape(BlockState state);
@@ -146,7 +197,7 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
     private static final class Props {
         public static final InfProperty<Orientation> ORIENTATION = InfProperty.Creators.create(
                 EnumProperty.create("orientation", Orientation.class),
-                Orientation.NORTH,
+                Orientation.SOUTH,
                 (mirror, value) -> value.mirror(mirror),
                 (rotation, value) -> value.rotate(rotation)
         );
@@ -170,8 +221,12 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
 
         }
 
-        public int getSizeIndex(BlockState state) {
+        public final int getSizeIndex(BlockState state) {
             return this.size.fetch(state) - 1;
+        }
+
+        public final BlockState setSizeIndex(BlockState state, int index) {
+            return this.size.apply(state, index + 1);
         }
 
         public final InfPropertyConfiguration getConfiguration() {
@@ -184,6 +239,14 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
 
         public final int getY(BlockState state) {
             return this.y.fetch(state);
+        }
+
+        public final BlockState setX(BlockState state, int x) {
+            return this.x.apply(state, x);
+        }
+
+        public final BlockState setY(BlockState state, int y) {
+            return this.y.apply(state, y);
         }
 
         public final BlockState setOrientation(BlockState state, Direction orientation) {
@@ -220,18 +283,52 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
             return this.dir;
         }
 
-        public int xRelToAbs(int x, int y) {
-            float angle = this.getDirection().toYRot();
-            float cos = Mth.cos(angle);
-            float sin = Mth.sin(angle);
-            return (int) (x*cos - y*sin);
+        public int xRelToAbs(int xRel, int yRel, int xSizeRel, int ySizeRel) {
+            return switch (this) {
+                case NORTH -> xSizeRel - xRel - 1;
+                case SOUTH -> xRel;
+                case WEST -> yRel;
+                case EAST -> ySizeRel - yRel - 1;
+            };
         }
 
-        public int yRelToAbs(int x, int y) {
-            float angle = this.getDirection().toYRot();
-            float cos = Mth.cos(angle);
-            float sin = Mth.sin(angle);
-            return (int) (x*sin + y*cos);
+        public int yRelToAbs(int xRel, int yRel, int xSizeRel, int ySizeRel) {
+            return switch (this) {
+                case NORTH -> ySizeRel - yRel - 1;
+                case SOUTH -> yRel;
+                case WEST -> xRel;
+                case EAST -> xSizeRel - xRel - 1;
+            };
+        }
+
+        public int xAbsToRel(int xAbs, int yAbs, int xSizeRel, int ySizeRel) {
+            return switch (this) {
+                case NORTH -> xSizeRel - xAbs - 1;
+                case SOUTH -> xAbs;
+                case WEST -> yAbs;
+                case EAST -> ySizeRel - yAbs - 1;
+            };
+        }
+
+        public int yAbsToRel(int xAbs, int yAbs, int xSizeRel, int ySizeRel) {
+            return switch (this) {
+                case NORTH -> ySizeRel - yAbs - 1;
+                case SOUTH -> yAbs;
+                case WEST -> xAbs;
+                case EAST -> xSizeRel - xAbs - 1;
+            };
+        }
+
+        public Direction.Axis getAxis() {
+            return this.getDirection().getAxis();
+        }
+
+        public Orientation getClockWise() {
+            return fromDirection(this.getDirection().getClockWise());
+        }
+
+        public Orientation getCounterClockWise() {
+            return fromDirection(this.getDirection().getCounterClockWise());
         }
 
         public Orientation mirror(Mirror mirror) {
