@@ -3,8 +3,6 @@ package com.infinityraider.miney_games.core;
 import com.infinityraider.infinitylib.block.BlockBaseTile;
 import com.infinityraider.infinitylib.block.property.InfProperty;
 import com.infinityraider.infinitylib.block.property.InfPropertyConfiguration;
-import com.infinityraider.infinitylib.block.property.MirrorHandler;
-import com.infinityraider.infinitylib.block.property.RotationHandler;
 import com.infinityraider.infinitylib.block.tile.TileEntityBase;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -12,6 +10,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -60,14 +60,14 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
         return this.getAllSizes().stream()
                 .mapToInt(MineyGameSize::getWidth)
                 .max()
-                .orElseThrow(() -> new IllegalStateException("Miney Game Block Should at least have one size"));
+                .orElseThrow(() -> new IllegalStateException("Miney Game Block Should have at least one size"));
     }
 
     public int getMaxDepth() {
         return this.getAllSizes().stream()
                 .mapToInt(MineyGameSize::getDepth)
                 .max()
-                .orElseThrow(() -> new IllegalStateException("Miney Game Block Should at least have one size"));
+                .orElseThrow(() -> new IllegalStateException("Miney Game Block Should have at least one size"));
     }
 
     public int getRelX(BlockState state) {
@@ -142,12 +142,13 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
         return this.getShape(state, world, pos, context);
     }
 
+    /** Implicit class to handle block properties */
     private static final class Props {
         public static final InfProperty<Orientation> ORIENTATION = InfProperty.Creators.create(
                 EnumProperty.create("orientation", Orientation.class),
                 Orientation.NORTH,
-                Orientation.MIRROR_HANDLER,
-                Orientation.ROTATION_HANDLER
+                (mirror, value) -> value.mirror(mirror),
+                (rotation, value) -> value.rotate(rotation)
         );
 
         private final InfPropertyConfiguration properties;
@@ -200,10 +201,9 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
         public final Orientation getOrientation(BlockState state) {
             return ORIENTATION.fetch(state);
         }
-
     }
 
-    // Wrapper for direction to allow easy rotation of x and y coordinates
+    /** Wrapper for direction to allow easy rotation of x and y coordinates */
     public enum Orientation implements StringRepresentable {
         NORTH(Direction.NORTH),
         SOUTH(Direction.SOUTH),
@@ -234,6 +234,14 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
             return (int) (x*sin + y*cos);
         }
 
+        public Orientation mirror(Mirror mirror) {
+            return fromDirection(mirror.mirror(this.getDirection()));
+        }
+
+        public Orientation rotate(Rotation rotation) {
+            return fromDirection(rotation.rotate(this.getDirection()));
+        }
+
         @Override
         public String getSerializedName() {
             return this.getDirection().getSerializedName();
@@ -248,9 +256,5 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
             }
             throw new IllegalArgumentException("can not convert a vertical direction to an orientation");
         }
-
-        public static final MirrorHandler<Orientation> MIRROR_HANDLER = (mirror, value) -> fromDirection(mirror.mirror(value.getDirection()));
-
-        public static final RotationHandler<Orientation> ROTATION_HANDLER = (rotation, value) -> fromDirection(rotation.rotate(value.getDirection()));
     }
 }
