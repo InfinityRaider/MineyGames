@@ -1,0 +1,11 @@
+{
+  "forge_marker": 1,
+  "multipart": [
+    {
+      "when": {},
+      "apply": {
+        "model": "minecraft:missing"
+      }
+    }
+  ]
+}
