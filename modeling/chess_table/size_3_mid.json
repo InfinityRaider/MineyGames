@@ -1,0 +1,26 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "miney_games:block/chess_table",
+		"4": "quartz_pillar_top",
+		"particle": "miney_games:block/chess_table"
+	},
+	"elements": [
+		{
+			"name": "base",
+			"from": [0, 0, 0],
+			"to": [16, 0, 16],
+			"faces": {
+				"down": {"uv": [0, 0, 16, 16], "texture": "#4", "cullface": "down"}
+			}
+		},
+		{
+			"name": "table",
+			"from": [0, 12, 0],
+			"to": [16, 12, 16],
+			"faces": {
+				"up": {"uv": [5.33333, 5.33333, 10.66667, 10.66667], "texture": "#0"}
+			}
+		}
+	]
+}

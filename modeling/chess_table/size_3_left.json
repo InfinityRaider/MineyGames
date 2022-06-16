@@ -1,0 +1,43 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "miney_games:block/chess_table",
+		"1": "quartz_block_bottom",
+		"3": "quartz_pillar",
+		"4": "quartz_pillar_top",
+		"particle": "miney_games:block/chess_table"
+	},
+	"elements": [
+		{
+			"name": "base",
+			"from": [0, 0, 6],
+			"to": [10, 2, 16],
+			"faces": {
+				"north": {"uv": [6, 14, 16, 16], "texture": "#3"},
+				"east": {"uv": [6, 14, 16, 16], "texture": "#3"},
+				"up": {"uv": [6, 0, 16, 10], "texture": "#4"},
+				"down": {"uv": [6, 6, 16, 16], "texture": "#4", "cullface": "down"}
+			}
+		},
+		{
+			"name": "pillar",
+			"from": [0, 2, 13],
+			"to": [3, 8, 16],
+			"faces": {
+				"north": {"uv": [13, 8, 16, 14], "texture": "#3"},
+				"east": {"uv": [13, 8, 16, 14], "texture": "#3"}
+			}
+		},
+		{
+			"name": "table",
+			"from": [0, 8, 0],
+			"to": [16, 12, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 4], "texture": "#3"},
+				"east": {"uv": [0, 0, 16, 4], "texture": "#3"},
+				"up": {"uv": [10.66667, 0, 16, 5.33333], "texture": "#0"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		}
+	]
+}
