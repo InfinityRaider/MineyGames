@@ -49,16 +49,16 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
 
     protected abstract List<MineyGameSize> getAllSizes();
 
+    public boolean isFunctional(BlockState state) {
+        return this.getProps().isFunctional(state);
+    }
+
     public MineyGameSize getSize(BlockState state) {
-        return this.getAllSizes().get(this.getProps().getSizeIndex(state));
+        return this.getProps().getSize(state);
     }
 
     public BlockState setSize(BlockState state, MineyGameSize size) {
-        int index = this.getAllSizes().indexOf(size);
-        if(index < 0) {
-            return state;
-        }
-        return this.getProps().setSizeIndex(state, index);
+        return this.getProps().setSize(state, size);
     }
 
     public int getWidth(BlockState state) {
@@ -202,6 +202,11 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
                 (rotation, value) -> value.rotate(rotation)
         );
 
+        private static final MineyGameSize SINGLE = new MineyGameSize(1, 1);
+
+        private final List<MineyGameSize> sizes;
+        private final boolean single;
+
         private final InfPropertyConfiguration properties;
 
         private final InfProperty<Integer> size;
@@ -209,7 +214,9 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
         private final InfProperty<Integer> y;
 
         private Props(BlockMineyGame<?> block) {
-            this.size = InfProperty.Creators.create("size", 1, 1, block.getAllSizes().size());
+            this.sizes = block.getAllSizes();
+            this.single = sizes.contains(SINGLE);
+            this.size = InfProperty.Creators.create("size", 1,  this.allowSingle() ? 1 : 0, this.getSizes().size());
             this.x = InfProperty.Creators.create("x", 0, 0, block.getMaxWidth() - 1);
             this.y = InfProperty.Creators.create("y", 0, 0, block.getMaxDepth() - 1);
             this.properties = InfPropertyConfiguration.builder()
@@ -221,12 +228,28 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
 
         }
 
-        public final int getSizeIndex(BlockState state) {
-            return this.size.fetch(state) - 1;
+        public boolean allowSingle() {
+            return this.single;
         }
 
-        public final BlockState setSizeIndex(BlockState state, int index) {
-            return this.size.apply(state, index + 1);
+        public List<MineyGameSize> getSizes() {
+            return this.sizes;
+        }
+
+        public boolean isFunctional(BlockState state) {
+            if(this.getSize(state).equals(SINGLE)) {
+                return this.allowSingle();
+            }
+            return true;
+        }
+
+        public final MineyGameSize getSize(BlockState state) {
+            int index = this.size.fetch(state) - 1;
+            return index < 0 ? SINGLE : this.getSizes().get(index);
+        }
+
+        public final BlockState setSize(BlockState state, MineyGameSize size) {
+            return this.size.apply(state, this.getSizes().indexOf(size) + 1);
         }
 
         public final InfPropertyConfiguration getConfiguration() {

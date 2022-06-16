@@ -78,4 +78,16 @@ public class MineyGameSize {
         // either width or depth does not match, not a valid shape
         return Optional.empty();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+        if(obj instanceof MineyGameSize) {
+            MineyGameSize other = (MineyGameSize) obj;
+            return other.getWidth() == this.getWidth() && other.getDepth() == this.getDepth();
+        }
+        return false;
+    }
 }
