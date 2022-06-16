@@ -1,500 +1,1329 @@
 {
   "forge_marker": 1,
-  "variants": {
-    "size=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_1"
-    }],
-    "size=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_1",
-      "y": 90
-    }],
-    "size=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_1",
-      "y": 180
-    }],
-    "size=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_1",
-      "y": 270
-    }],
+  "multipart": [
+    {
+      "when": {
+        "orientation": "south",
+        "size": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_1"
+      }
+    },
+
+    {
+      "when": {
+        "orientation": "south",
+        "size": 2,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_right"
+      }
+    }, {
+      "when": {
+        "orientation": "south",
+        "size": 2,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_right",
+        "y": 180
+      }
+    }, {
+      "when": {
+        "orientation": "south",
+        "size": 2,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_left"
+      }
+    }, {
+      "when": {
+        "orientation": "south",
+        "size": 2,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_left",
+        "y": 180
+      }
+    },
+
+    {
+      "when": {
+        "orientation": "south",
+        "size": 3,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_right"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 3,
+        "x": 2,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_right",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 3,
+        "x": 2,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_left"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 3,
+        "x": 0,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 3,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_x"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 3,
+        "x": 1,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_x",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 3,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_y"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 3,
+        "x": 2,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_y",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 3,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_mid"
+      }
+    },
+
+    {
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_right"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 3,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_right",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 3,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_left"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 0,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 2,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_left"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 1,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_right"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 2,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_right",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 3,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_left"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 0,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_right"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 3,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_right",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 2,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_left"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 1,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_right"
+      }
+    },{
+      "when": {
+        "orientation": "south",
+        "size": 4,
+        "x": 2,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_right",
+        "y": 180
+      }
+    },
 
 
 
 
-    "size=2,x=0,y=0,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_2_left"
-    }],
-    "size=2,x=0,y=0,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_2_left",
-      "y": 90
-    }],
-    "size=2,x=0,y=0,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_2_left",
-      "y": 180
-    }],
-    "size=2,x=0,y=0,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_2_left",
-      "y": 270
-    }],
 
-    "size=2,x=1,y=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_2_left",
-      "y": 180
-    }],
-    "size=2,x=1,y=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_2_left",
-      "y": 270
-    }],
-    "size=2,x=1,y=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_2_left"
-    }],
-    "size=2,x=1,y=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_2_left",
-      "y": 90
-    }],
+    {
+      "when": {
+        "orientation": "east",
+        "size": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_1",
+        "y": 90
+      }
+    },
 
-    "size=2,x=1,y=0,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_2_right"
-    }],
-    "size=2,x=1,y=0,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_2_right",
-      "y": 90
-    }],
-    "size=2,x=1,y=0,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_2_right",
-      "y": 180
-    }],
-    "size=2,x=1,y=0,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_2_right",
-      "y": 270
-    }],
+    {
+      "when": {
+        "orientation": "east",
+        "size": 2,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_right",
+        "y": 90
+      }
+    }, {
+      "when": {
+        "orientation": "east",
+        "size": 2,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_right",
+        "y": 270
+      }
+    }, {
+      "when": {
+        "orientation": "east",
+        "size": 2,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_left",
+        "y": 90
+      }
+    }, {
+      "when": {
+        "orientation": "east",
+        "size": 2,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_left",
+        "y": 270
+      }
+    },
 
-    "size=2,x=0,y=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_2_right",
-      "y": 180
-    }],
-    "size=2,x=0,y=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_2_right",
-      "y": 270
-    }],
-    "size=2,x=0,y=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_2_right"
-    }],
-    "size=2,x=0,y=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_2_right",
-      "y": 90
-    }],
+    {
+      "when": {
+        "orientation": "east",
+        "size": 3,
+        "x": 2,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_right",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 3,
+        "x": 0,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_right",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 3,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 3,
+        "x": 2,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 3,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_x",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 3,
+        "x": 1,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_x",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 3,
+        "x": 2,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_y",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 3,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_y",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 3,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_mid",
+        "y": 90
+      }
+    },
 
-
-
-
-    "size=3,x=0,y=0,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_3_left"
-    }],
-    "size=3,x=0,y=0,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_3_left",
-      "y": 90
-    }],
-    "size=3,x=0,y=0,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_3_left",
-      "y": 180
-    }],
-    "size=3,x=0,y=0,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_3_left",
-      "y": 270
-    }],
-
-    "size=3,x=2,y=2,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_3_left",
-      "y": 180
-    }],
-    "size=3,x=2,y=2,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_3_left",
-      "y": 270
-    }],
-    "size=3,x=2,y=2,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_3_left"
-    }],
-    "size=3,x=2,y=2,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_3_left",
-      "y": 90
-    }],
-
-    "size=3,x=2,y=0,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_3_right"
-    }],
-    "size=3,x=2,y=0,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_3_right",
-      "y": 90
-    }],
-    "size=3,x=2,y=0,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_3_right",
-      "y": 180
-    }],
-    "size=3,x=2,y=0,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_3_right",
-      "y": 270
-    }],
-
-    "size=3,x=0,y=2,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_3_right",
-      "y": 180
-    }],
-    "size=3,x=0,y=2,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_3_right",
-      "y": 270
-    }],
-    "size=3,x=0,y=2,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_3_right"
-    }],
-    "size=3,x=0,y=2,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_3_right",
-      "y": 90
-    }],
-
-
-    "size=3,x=0,y=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_3_edge_y"
-    }],
-    "size=3,x=0,y=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_3_edge_y",
-      "y": 90
-    }],
-    "size=3,x=0,y=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_3_edge_y",
-      "y": 180
-    }],
-    "size=3,x=0,y=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_3_edge_y",
-      "y": 270
-    }],
-
-    "size=3,x=2,y=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_3_edge_y",
-      "y": 180
-    }],
-    "size=3,x=2,y=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_3_edge_y",
-      "y": 270
-    }],
-    "size=3,x=2,y=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_3_edge_y"
-    }],
-    "size=3,x=2,y=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_3_edge_y",
-      "y": 90
-    }],
-
-    "size=3,x=1,y=0,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_3_edge_x"
-    }],
-    "size=3,x=1,y=0,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_3_edge_x",
-      "y": 90
-    }],
-    "size=3,x=1,y=0,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_3_edge_x",
-      "y": 180
-    }],
-    "size=3,x=1,y=0,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_3_edge_x",
-      "y": 270
-    }],
-
-    "size=3,x=1,y=2,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_3_edge_x",
-      "y": 180
-    }],
-    "size=3,x=1,y=2,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_3_edge_x",
-      "y": 270
-    }],
-    "size=3,x=1,y=2,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_3_edge_x"
-    }],
-    "size=3,x=1,y=2,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_3_edge_x",
-      "y": 90
-    }],
-
-
-    "size=3,x=1,y=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_3_mid"
-    }],
-    "size=3,x=1,y=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_3_mid",
-      "y": 90
-    }],
-    "size=3,x=1,y=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_3_mid",
-      "y": 180
-    }],
-    "size=3,x=1,y=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_3_mid",
-      "y": 270
-    }],
-
-
-
-
-    "size=4,x=0,y=0,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_left"
-    }],
-    "size=4,x=0,y=0,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_left",
-      "y": 90
-    }],
-    "size=4,x=0,y=0,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_left",
-      "y": 180
-    }],
-    "size=4,x=0,y=0,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_left",
-      "y": 270
-    }],
-
-    "size=4,x=3,y=3,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_left",
-      "y": 180
-    }],
-    "size=4,x=3,y=3,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_left",
-      "y": 270
-    }],
-    "size=4,x=3,y=3,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_left"
-    }],
-    "size=4,x=3,y=3,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_left",
-      "y": 90
-    }],
-
-    "size=4,x=3,y=0,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_right"
-    }],
-    "size=4,x=3,y=0,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_right",
-      "y": 90
-    }],
-    "size=4,x=3,y=0,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_right",
-      "y": 180
-    }],
-    "size=4,x=3,y=0,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_right",
-      "y": 270
-    }],
-
-    "size=4,x=0,y=3,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_right",
-      "y": 180
-    }],
-    "size=4,x=0,y=3,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_right",
-      "y": 270
-    }],
-    "size=4,x=0,y=3,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_right"
-    }],
-    "size=4,x=0,y=3,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_right",
-      "y": 90
-    }],
-
-
-
-    "size=4,x=1,y=0,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_left"
-    }],
-    "size=4,x=1,y=0,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_left",
-      "y": 90
-    }],
-    "size=4,x=1,y=0,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_left",
-      "y": 180
-    }],
-    "size=4,x=1,y=0,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_left",
-      "y": 270
-    }],
-
-    "size=4,x=2,y=3,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_left",
-      "y": 180
-    }],
-    "size=4,x=2,y=3,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_left",
-      "y": 270
-    }],
-    "size=4,x=2,y=3,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_left"
-    }],
-    "size=4,x=2,y=3,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_left",
-      "y": 90
-    }],
-
-    "size=4,x=2,y=0,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_right"
-    }],
-    "size=4,x=2,y=0,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_right",
-      "y": 90
-    }],
-    "size=4,x=2,y=0,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_right",
-      "y": 180
-    }],
-    "size=4,x=2,y=0,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_right",
-      "y": 270
-    }],
-
-    "size=4,x=1,y=3,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_right",
-      "y": 180
-    }],
-    "size=4,x=1,y=3,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_right",
-      "y": 270
-    }],
-    "size=4,x=1,y=3,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_right"
-    }],
-    "size=4,x=1,y=3,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_edge_y_right",
-      "y": 90
-    }],
-
-
-    "size=4,x=0,y=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_left"
-    }],
-    "size=4,x=0,y=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_left",
-      "y": 90
-    }],
-    "size=4,x=0,y=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_left",
-      "y": 180
-    }],
-    "size=4,x=0,y=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_left",
-      "y": 270
-    }],
-
-    "size=4,x=3,y=2,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_left",
-      "y": 180
-    }],
-    "size=4,x=3,y=2,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_left",
-      "y": 270
-    }],
-    "size=4,x=3,y=2,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_left"
-    }],
-    "size=4,x=3,y=2,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_left",
-      "y": 90
-    }],
-
-    "size=4,x=0,y=2,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_right"
-    }],
-    "size=4,x=0,y=2,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_right",
-      "y": 90
-    }],
-    "size=4,x=0,y=2,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_right",
-      "y": 180
-    }],
-    "size=4,x=0,y=2,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_right",
-      "y": 270
-    }],
-
-    "size=4,x=3,y=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_right",
-      "y": 180
-    }],
-    "size=4,x=3,y=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_right",
-      "y": 270
-    }],
-    "size=4,x=3,y=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_right"
-    }],
-    "size=4,x=3,y=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_edge_x_right",
-      "y": 90
-    }],
+    {
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 3,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_right",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 0,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_right",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 3,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 2,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 2,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_right",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 1,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_right",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 0,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 3,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 3,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_right",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_right",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 2,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 2,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_right",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "east",
+        "size": 4,
+        "x": 1,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_right",
+        "y": 270
+      }
+    },
 
 
 
-    "size=4,x=1,y=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_mid_left"
-    }],
-    "size=4,x=1,y=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_mid_left",
-      "y": 90
-    }],
-    "size=4,x=1,y=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_mid_left",
-      "y": 180
-    }],
-    "size=4,x=1,y=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_mid_left",
-      "y": 270
-    }],
 
-    "size=4,x=2,y=2,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_mid_left",
-      "y": 180
-    }],
-    "size=4,x=2,y=2,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_mid_left",
-      "y": 270
-    }],
-    "size=4,x=2,y=2,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_mid_left"
-    }],
-    "size=4,x=2,y=2,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_mid_left",
-      "y": 90
-    }],
+    {
+      "when": {
+        "orientation": "north",
+        "size": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_1",
+        "y": 180
+      }
+    },
 
-    "size=4,x=1,y=2,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_mid_right"
-    }],
-    "size=4,x=1,y=2,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_mid_right",
-      "y": 90
-    }],
-    "size=4,x=1,y=2,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_mid_right",
-      "y": 180
-    }],
-    "size=4,x=1,y=2,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_mid_right",
-      "y": 270
-    }],
+    {
+      "when": {
+        "orientation": "north",
+        "size": 2,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_right",
+        "y": 180
+      }
+    }, {
+      "when": {
+        "orientation": "north",
+        "size": 2,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_right"
+      }
+    }, {
+      "when": {
+        "orientation": "north",
+        "size": 2,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_left",
+        "y": 180
+      }
+    }, {
+      "when": {
+        "orientation": "north",
+        "size": 2,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_left"
+      }
+    },
 
-    "size=4,x=2,y=1,orientation=south": [{
-      "model": "miney_games:block/chess_table/size_4_mid_right",
-      "y": 180
-    }],
-    "size=4,x=2,y=1,orientation=west": [{
-      "model": "miney_games:block/chess_table/size_4_mid_right",
-      "y": 270
-    }],
-    "size=4,x=2,y=1,orientation=north": [{
-      "model": "miney_games:block/chess_table/size_4_mid_right"
-    }],
-    "size=4,x=2,y=1,orientation=east": [{
-      "model": "miney_games:block/chess_table/size_4_mid_right",
-      "y": 90
-    }]
-  }
+    {
+      "when": {
+        "orientation": "north",
+        "size": 3,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_right",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 3,
+        "x": 2,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_right"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 3,
+        "x": 2,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 3,
+        "x": 0,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_left"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 3,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_x",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 3,
+        "x": 1,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_x"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 3,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_y",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 3,
+        "x": 2,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_y"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 3,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_mid",
+        "y": 180
+      }
+    },
+
+    {
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_right",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 3,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_right"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 3,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 0,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_left"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 2,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 1,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_left"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_right",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 2,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_right"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 3,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_left"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 0,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_right",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 3,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_right"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 2,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_left",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 1,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_left"
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_right",
+        "y": 180
+      }
+    },{
+      "when": {
+        "orientation": "north",
+        "size": 4,
+        "x": 2,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_right"
+      }
+    },
+
+
+
+
+
+    {
+      "when": {
+        "orientation": "west",
+        "size": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_1",
+        "y": 270
+      }
+    },
+
+    {
+      "when": {
+        "orientation": "west",
+        "size": 2,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_right",
+        "y": 270
+      }
+    }, {
+      "when": {
+        "orientation": "west",
+        "size": 2,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_right",
+        "y": 90
+      }
+    }, {
+      "when": {
+        "orientation": "west",
+        "size": 2,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_left",
+        "y": 270
+      }
+    }, {
+      "when": {
+        "orientation": "west",
+        "size": 2,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_2_left",
+        "y": 90
+      }
+    },
+
+    {
+      "when": {
+        "orientation": "west",
+        "size": 3,
+        "x": 2,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_right",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 3,
+        "x": 0,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_right",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 3,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 3,
+        "x": 2,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 3,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_x",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 3,
+        "x": 1,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_x",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 3,
+        "x": 2,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_y",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 3,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_edge_y",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 3,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_3_mid",
+        "y": 270
+      }
+    },
+
+    {
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 3,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_right",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 0,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_right",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 0,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 3,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 1,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 2,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 2,
+        "y": 0
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_right",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 1,
+        "y": 3
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_x_right",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 0,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 3,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 3,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_right",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 0,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_edge_y_right",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 1,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_left",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 2,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_left",
+        "y": 90
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 2,
+        "y": 1
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_right",
+        "y": 270
+      }
+    },{
+      "when": {
+        "orientation": "west",
+        "size": 4,
+        "x": 1,
+        "y": 2
+      },
+      "apply": {
+        "model": "miney_games:block/chess_table/size_4_mid_right",
+        "y": 90
+      }
+    }
+  ]
 }

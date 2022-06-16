@@ -1,4 +1,5 @@
 {
+	"parent": "minecraft:block/block",
 	"textures": {
 		"1": "minecraft:block/quartz_pillar",
 		"2": "minecraft:block/quartz_pillar_top",
