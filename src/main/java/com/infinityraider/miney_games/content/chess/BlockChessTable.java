@@ -70,7 +70,7 @@ public class BlockChessTable extends BlockMineyGame<TileChessTable> {
 
     public static class Size extends MineyGameSize {
         private static final int TEX_SIZE = 96;
-        private static final int MARGIN = 3;
+        private static final int MARGIN = 4;
         private static final int SQUARES = 8;
 
         public Size(int width) {

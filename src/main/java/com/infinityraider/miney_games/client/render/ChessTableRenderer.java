@@ -6,8 +6,6 @@ import com.infinityraider.infinitylib.render.tile.ITileRenderer;
 import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.content.chess.TileChessTable;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.player.Player;
@@ -25,9 +23,6 @@ public class ChessTableRenderer implements ITileRenderer<TileChessTable>, IRende
     }
 
     protected void drawSquareHighlight(TileChessTable tile, PoseStack transforms, MultiBufferSource buffer) {
-        if(!(buffer instanceof MultiBufferSource.BufferSource)) {
-            return;
-        }
         Player player = MineyGames.instance.getClientPlayer();
         if(player == null) {
             return;
@@ -45,51 +40,31 @@ public class ChessTableRenderer implements ITileRenderer<TileChessTable>, IRende
                 return;
             }
             // calculate highlight rendering bounds
-            double x1 = Math.max(tile.getBlockPos().getX() - tile.getAbsX() + tile.getChessSquareMin(iX), tile.getBlockPos().getX());
-            double x2 = Math.min(tile.getBlockPos().getX() - tile.getAbsX() + tile.getChessSquareMax(iX), tile.getBlockPos().getX() + 1);
-            double z1 = Math.max(tile.getBlockPos().getZ() - tile.getAbsY() + tile.getChessSquareMin(iZ), tile.getBlockPos().getZ());
-            double z2 = Math.min(tile.getBlockPos().getZ() - tile.getAbsY() + tile.getChessSquareMax(iZ), tile.getBlockPos().getZ() + 1);
-            double y = tile.getBlockPos().getY() + 12*Constants.UNIT + 0.001 + 1;
-            // draw the highlight
+            double x1 = Math.max(tile.getChessSquareMin(iX) - tile.getAbsX(), 0);
+            double x2 = Math.min(tile.getChessSquareMax(iX) - tile.getAbsX(), 1);
+            double z1 = Math.max(tile.getChessSquareMin(iZ) - tile.getAbsY(), 0);
+            double z2 = Math.min(tile.getChessSquareMax(iZ) - tile.getAbsY(), 1);
+            // check if the bounds are within the block's position
+            if(x1 >= 1 || x2 <= 0 || z1 >= 1 || z2 <= 0) {
+                return;
+            }
             VertexConsumer builder = buffer.getBuffer(HighLightRenderType.INSTANCE);
             if(!(builder instanceof BufferBuilder)) {
                 return;
             }
-            this.drawSquare(builder, transforms, x1, z1, x2, z2, y, 0, 0, 255, 128);
-
-
-            this.drawSquare(
-                    builder,
-                    transforms,
-                    tile.getBlockPos().getX(),
-                    tile.getBlockPos().getZ(),
-                    tile.getBlockPos().getX() + 1,
-                    tile.getBlockPos().getZ() + 1,
-                    tile.getBlockPos().getY() + 1,
-                    0, 255, 0, 255
-            );
-
-            ((MultiBufferSource.BufferSource) buffer).endBatch(HighLightRenderType.INSTANCE);
+            this.drawSquare(builder, transforms, x1, z1, x2, z2, 12*Constants.UNIT + 0.001, 0, 0, 255, 64);
         });
     }
 
     protected void drawSquare(VertexConsumer builder, PoseStack transforms, double x1, double z1, double x2, double z2, double y, int r, int g, int b, int a) {
         this.drawVertex(builder, transforms, x1, y, z1, r, g, b, a);
-        this.drawVertex(builder, transforms, x2, y, z1, r, g, b, a);
-        this.drawVertex(builder, transforms, x2, y, z2, r, g, b, a);
         this.drawVertex(builder, transforms, x1, y, z2, r, g, b, a);
-
-
-        this.drawVertex(builder, transforms, x1, y, z1, b, g, r, a);
-        this.drawVertex(builder, transforms, x1, y, z2, b, g, r, a);
-        this.drawVertex(builder, transforms, x2, y, z2, b, g, r, a);
-        this.drawVertex(builder, transforms, x2, y, z1, b, g, r, a);
+        this.drawVertex(builder, transforms, x2, y, z2, r, g, b, a);
+        this.drawVertex(builder, transforms, x2, y, z1, r, g, b, a);
     }
 
     protected void drawVertex(VertexConsumer builder, PoseStack transforms, double x, double y, double z, int r, int g, int b, int a) {
-        Matrix4f matrix = transforms.last().pose();
-        Matrix3f normal = transforms.last().normal();
-        builder.vertex(matrix, (float) x, (float) y, (float) z).color(r, g, b, a).endVertex();//.normal(normal,0, 1, 0);
+        builder.vertex(transforms.last().pose(), (float) x, (float) y, (float) z).color(r, g, b, a).endVertex();
     }
 
     public static class HighLightRenderType extends RenderType {
