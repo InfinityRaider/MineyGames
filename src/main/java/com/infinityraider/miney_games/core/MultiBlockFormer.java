@@ -89,8 +89,7 @@ public class MultiBlockFormer {
         size.stream(this.getMin(), this.getOrientation()).forEach(pos -> {
             BlockState state = this.getBlock().defaultBlockState();
             state = this.getBlock().setOrientation(state, this.getOrientation());
-            state = this.getBlock().setSize(state, size);
-            state = this.getBlock().setAbsCoordinates(state, pos.getX() - this.getMin().getX(), pos.getZ() - this.getMin().getZ());
+            state = this.getBlock().setSizeAndPosition(state, size, pos.getX() - this.getMin().getX(), pos.getZ() - this.getMin().getZ());
             this.getWorld().setBlock(pos, state, 3);
         });
     }

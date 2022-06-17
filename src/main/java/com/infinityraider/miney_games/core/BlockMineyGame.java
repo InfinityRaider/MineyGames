@@ -18,12 +18,17 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -57,30 +62,12 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
         return this.getProps().getSize(state);
     }
 
-    public BlockState setSize(BlockState state, MineyGameSize size) {
-        return this.getProps().setSize(state, size);
-    }
-
     public int getWidth(BlockState state) {
         return this.getSize(state).getWidth();
     }
 
     public int getDepth(BlockState state) {
         return this.getSize(state).getDepth();
-    }
-
-    public int getMaxWidth() {
-        return this.getAllSizes().stream()
-                .mapToInt(MineyGameSize::getWidth)
-                .max()
-                .orElseThrow(() -> new IllegalStateException("Miney Game Block Should have at least one size"));
-    }
-
-    public int getMaxDepth() {
-        return this.getAllSizes().stream()
-                .mapToInt(MineyGameSize::getDepth)
-                .max()
-                .orElseThrow(() -> new IllegalStateException("Miney Game Block Should have at least one size"));
     }
 
     public int getRelX(BlockState state) {
@@ -101,11 +88,11 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
         return this.getOrientation(state).yRelToAbs(this.getRelX(state), this.getRelY(state), size.getWidth(), size.getDepth());
     }
 
-    public BlockState setAbsCoordinates(BlockState state, int xAbs, int yAbs) {
+    public BlockState setSizeAndPosition(BlockState state, MineyGameSize size, int xAbs, int yAbs) {
         Orientation orientation = this.getOrientation(state);
-        MineyGameSize size = this.getSize(state);
-        state = this.getProps().setX(state, orientation.xAbsToRel(xAbs, yAbs, size.getWidth(), size.getDepth()));
-        return this.getProps().setY(state, orientation.yAbsToRel(xAbs, yAbs, size.getWidth(), size.getDepth()));
+        int xRel = orientation.xAbsToRel(xAbs, yAbs, size.getWidth(), size.getDepth());
+        int yRel = orientation.yAbsToRel(xAbs, yAbs, size.getWidth(), size.getDepth());
+        return this.getProps().setSizeAndPosition(state, size, xRel, yRel);
     }
 
     public BlockState setOrientation(BlockState state, Direction orientation) {
@@ -142,10 +129,9 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
         super.destroy(world, pos, state);
         if(!world.isClientSide()) {
             Orientation orientation = this.getOrientation(state);
-            BlockState reverted = this.setOrientation(this.defaultBlockState(), orientation);
             this.getSize(state).stream(pos.offset(-this.getAbsX(state), 0, -this.getAbsY(state)), orientation)
                     .filter(p -> !p.equals(pos))
-                    .forEach(p -> world.setBlock(p, reverted, 3));
+                    .forEach(p -> world.setBlock(p, this.getProps().revert(world.getBlockState(p)), 3));
         }
     }
 
@@ -202,27 +188,19 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
                 (rotation, value) -> value.rotate(rotation)
         );
 
-        private static final MineyGameSize SINGLE = new MineyGameSize(1, 1);
+        private static final WrappedSize SINGLE = new WrappedSize(0, new MineyGameSize(1, 1));
 
         private final List<MineyGameSize> sizes;
         private final boolean single;
-
+        private final InfProperty<Position> position;
         private final InfPropertyConfiguration properties;
-
-        private final InfProperty<Integer> size;
-        private final InfProperty<Integer> x;
-        private final InfProperty<Integer> y;
 
         private Props(BlockMineyGame<?> block) {
             this.sizes = block.getAllSizes();
-            this.single = sizes.contains(SINGLE);
-            this.size = InfProperty.Creators.create("size", 1,  this.allowSingle() ? 1 : 0, this.getSizes().size());
-            this.x = InfProperty.Creators.create("x", 0, 0, block.getMaxWidth() - 1);
-            this.y = InfProperty.Creators.create("y", 0, 0, block.getMaxDepth() - 1);
+            this.single = sizes.contains(SINGLE.getSize());
+            this.position = this.initPositionProperty();
             this.properties = InfPropertyConfiguration.builder()
-                    .add(this.size)
-                    .add(this.x)
-                    .add(this.y)
+                    .add(this.position)
                     .add(ORIENTATION)
                     .build();
 
@@ -237,19 +215,32 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
         }
 
         public boolean isFunctional(BlockState state) {
-            if(this.getSize(state).equals(SINGLE)) {
+            if(this.getSize(state).equals(SINGLE.getSize())) {
                 return this.allowSingle();
             }
             return true;
         }
 
-        public final MineyGameSize getSize(BlockState state) {
-            int index = this.size.fetch(state) - 1;
-            return index < 0 ? SINGLE : this.getSizes().get(index);
+        private Position getPosition(BlockState state) {
+            return this.position.fetch(state);
         }
 
-        public final BlockState setSize(BlockState state, MineyGameSize size) {
-            return this.size.apply(state, this.getSizes().indexOf(size) + 1);
+        public final MineyGameSize getSize(BlockState state) {
+            return this.getPosition(state).getSize();
+        }
+
+        public final BlockState setSizeAndPosition(BlockState state, MineyGameSize size, int x, int y) {
+            return this.position.getPossibleValues().stream()
+                    .filter(p -> p.getSize().equals(size))
+                    .filter(p -> p.getX() == x)
+                    .filter(p -> p.getY() == y)
+                    .findFirst()
+                    .map(position -> this.position.apply(state, position))
+                    .orElse(state);
+        }
+
+        public final BlockState revert(BlockState state) {
+            return this.position.apply(state);
         }
 
         public final InfPropertyConfiguration getConfiguration() {
@@ -257,19 +248,11 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
         }
 
         public final int getX(BlockState state) {
-            return this.x.fetch(state);
+            return this.getPosition(state).getX();
         }
 
         public final int getY(BlockState state) {
-            return this.y.fetch(state);
-        }
-
-        public final BlockState setX(BlockState state, int x) {
-            return this.x.apply(state, x);
-        }
-
-        public final BlockState setY(BlockState state, int y) {
-            return this.y.apply(state, y);
+            return this.getPosition(state).getY();
         }
 
         public final BlockState setOrientation(BlockState state, Direction orientation) {
@@ -286,6 +269,147 @@ public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBase
 
         public final Orientation getOrientation(BlockState state) {
             return ORIENTATION.fetch(state);
+        }
+
+        private InfProperty<Position> initPositionProperty() {
+            PositionProperty property = new PositionProperty(Stream.concat(
+                    this.getSizes().stream().map(size -> new WrappedSize(this.getSizes().indexOf(size) + 1, size)),
+                    this.allowSingle() ? Stream.empty() : Stream.of(SINGLE)
+            ).flatMap(WrappedSize::stream).collect(Collectors.toMap(
+                    Position::getSerializedName,
+                    pos -> pos
+            )));
+            // return the inf property (no need for handling mirroring or rotations as this is handled by the orientation)
+            return InfProperty.Creators.create(property, property.getDefault());
+        }
+    }
+
+    /** Position property class */
+    public static final class PositionProperty extends Property<Position> {
+        private final Map<String, Position> positions;
+        private final Position defaultPosition;
+
+        protected PositionProperty(Map<String, Position> positions) {
+            super("position", Position.class);
+            this.positions = positions;
+            this.defaultPosition = positions.values().stream()
+                    .filter(pos -> pos.getSize().getWidth() == 1)
+                    .filter(pos -> pos.getSize().getDepth() == 1)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Can not initialize MineyGameBlock properties without a size 1"));
+        }
+
+        public Position getDefault() {
+            return this.defaultPosition;
+        }
+
+        @Override
+        public Collection<Position> getPossibleValues() {
+            return this.positions.values();
+        }
+
+        @Override
+        public String getName(Position position) {
+            return position.getSerializedName();
+        }
+
+        @Override
+        public Optional<Position> getValue(String name) {
+            return Optional.ofNullable(this.positions.get(name));
+        }
+    }
+
+    /** Wrapper for size in order to have unique positions */
+    private static final class WrappedSize {
+        private final int index;
+        private final MineyGameSize size;
+        private final Position[][] positions;
+
+        private WrappedSize(int index, MineyGameSize size) {
+            this.index = index;
+            this.size = size;
+            this.positions = new Position[this.getWidth()][this.getDepth()];
+            for(int x = 0; x < this.getWidth(); x++) {
+                for(int y = 0; y < this.getDepth(); y++) {
+                    this.positions[x][y] = new Position(this, x, y);
+                }
+            }
+        }
+
+        public int getIndex() {
+            return this.index;
+        }
+
+        public MineyGameSize getSize() {
+            return this.size;
+        }
+
+        public int getWidth() {
+            return this.getSize().getWidth();
+        }
+
+        public int getDepth() {
+            return this.getSize().getDepth();
+        }
+
+        public Position getPosition(int x, int y) {
+            return this.positions[x][y];
+        }
+
+        public Stream<Position> stream() {
+            return Arrays.stream(this.positions).flatMap(Arrays::stream);
+        }
+    }
+
+    /** Position class for the block state property */
+    private static class Position implements StringRepresentable, Comparable<Position> {
+        private final WrappedSize size;
+        private final int x;
+        private final int y;
+
+        protected Position(WrappedSize size, int x, int y) {
+            this.size = size;
+            this.x = x;
+            this.y = y;
+        }
+
+        public MineyGameSize getSize() {
+            return this.getWrappedSize().getSize();
+        }
+
+        public WrappedSize getWrappedSize() {
+            return this.size;
+        }
+
+        public int getIndex() {
+            return this.getWrappedSize().getIndex();
+        }
+
+        public int getX() {
+            return this.x;
+        }
+
+        public int getY() {
+            return this.y;
+        }
+
+        @Nonnull
+        @Override
+        public String getSerializedName() {
+            return "size_" + this.getIndex() + "_x" + this.getX() + "_y" + this.getY();
+        }
+
+        @Override
+        public int compareTo(@NotNull Position other) {
+            int di = this.getIndex() - other.getIndex();
+            if(di != 0) {
+                return di;
+            }
+            int dx = this.getX() - other.getX();
+            if(dx != 0) {
+                return dx;
+            }
+            return this.getY() - other.getY();
         }
     }
 
