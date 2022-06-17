@@ -3,7 +3,6 @@ package com.infinityraider.miney_games.core;
 import com.infinityraider.infinitylib.block.BlockBaseTile;
 import com.infinityraider.infinitylib.block.property.InfProperty;
 import com.infinityraider.infinitylib.block.property.InfPropertyConfiguration;
-import com.infinityraider.infinitylib.block.tile.TileEntityBase;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,7 +29,7 @@ import java.util.stream.Stream;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class BlockMineyGame<T extends TileEntityBase> extends BlockBaseTile<T> {
+public abstract class BlockMineyGame<T extends TileMineyGame<?>> extends BlockBaseTile<T> {
 
     private Props props;
 

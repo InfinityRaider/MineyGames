@@ -24,10 +24,10 @@ import java.util.stream.Stream;
 @ParametersAreNonnullByDefault
 public class BlockChessTable extends BlockMineyGame<TileChessTable> {
     public static final List<MineyGameSize> SIZES = ImmutableList.of(
-            new MineyGameSize(1, 1),
-            new MineyGameSize(2, 2),
-            new MineyGameSize(3, 3),
-            new MineyGameSize(4, 4)
+            new Size(1),
+            new Size(2),
+            new Size(3),
+            new Size(4)
     );
 
     private static final BiFunction<BlockPos, BlockState, TileChessTable> TILE_FACTORY = TileChessTable::new;
@@ -37,6 +37,11 @@ public class BlockChessTable extends BlockMineyGame<TileChessTable> {
                 .strength(1.5F, 6.0F)
                 .noOcclusion()
         );
+    }
+
+    @Override
+    public Size getSize(BlockState state) {
+        return (Size) super.getSize(state);
     }
 
     @Override
@@ -61,6 +66,49 @@ public class BlockChessTable extends BlockMineyGame<TileChessTable> {
                 default -> Shapes.block();
             };
         });
+    }
+
+    public static class Size extends MineyGameSize {
+        private static final int TEX_SIZE = 96;
+        private static final int MARGIN = 3;
+        private static final int SQUARES = 8;
+
+        public Size(int width) {
+            super(width, width);
+        }
+
+        public double getBoardMin() {
+            return (0.0 + MARGIN*this.getWidth())/TEX_SIZE;
+        }
+
+        public double getBoardMax() {
+            return (0.0 + (TEX_SIZE - MARGIN)*this.getWidth())/TEX_SIZE;
+        }
+
+        public int getSquareIndex(double x) {
+            double min = this.getBoardMin();
+            double max = this.getBoardMax();
+            double squareSize = (max - min)/SQUARES;
+            if(x < min || x > max) {
+                // outside of the board
+                return -1;
+            }
+            return (int) ((x - min)/squareSize);
+        }
+
+        public double getSquareMin(int square) {
+            double min = this.getBoardMin();
+            double max = this.getBoardMax();
+            double squareSize = (max - min)/SQUARES;
+            return min + squareSize*square;
+        }
+
+        public double getSquareMax(int square) {
+            double min = this.getBoardMin();
+            double max = this.getBoardMax();
+            double squareSize = (max - min)/SQUARES;
+            return min + squareSize*(1 + square);
+        }
     }
 
     public static class HitBoxes {

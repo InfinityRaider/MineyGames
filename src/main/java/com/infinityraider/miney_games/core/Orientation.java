@@ -110,6 +110,22 @@ public enum Orientation implements StringRepresentable {
         };
     }
 
+    public double xRelToAbs(double xRel, double yRel, MineyGameSize size) {
+        return this.xRelToAbs(xRel, yRel, size.getWidth(), size.getDepth());
+    }
+
+    public double yRelToAbs(double xRel, double yRel, MineyGameSize size) {
+        return this.yRelToAbs(xRel, yRel, size.getWidth(), size.getDepth());
+    }
+
+    public double xAbsToRel(double xAbs, double yAbs, MineyGameSize size) {
+        return this.xAbsToRel(xAbs, yAbs, size.getWidth(), size.getDepth());
+    }
+
+    public double yAbsToRel(double xAbs, double yAbs, MineyGameSize size) {
+        return this.yAbsToRel(xAbs, yAbs, size.getWidth(), size.getDepth());
+    }
+
     public Direction.Axis getAxis() {
         return this.getDirection().getAxis();
     }

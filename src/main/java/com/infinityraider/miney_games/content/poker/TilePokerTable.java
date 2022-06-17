@@ -4,6 +4,7 @@ import com.infinityraider.infinitylib.block.tile.InfinityTileEntityType;
 import com.infinityraider.infinitylib.block.tile.TileEntityBase;
 import com.infinityraider.miney_games.client.render.PokerTableRenderer;
 import com.infinityraider.miney_games.content.ModTiles;
+import com.infinityraider.miney_games.core.TileMineyGame;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -17,7 +18,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class TilePokerTable extends TileEntityBase {
+public class TilePokerTable extends TileMineyGame<BlockPokerTable> {
     public TilePokerTable(BlockPos pos, BlockState state) {
         super(ModTiles.getInstance().POKER_TABLE_TILE.get(), pos, state);
     }

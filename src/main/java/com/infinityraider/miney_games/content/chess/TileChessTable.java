@@ -1,23 +1,30 @@
 package com.infinityraider.miney_games.content.chess;
 
 import com.infinityraider.infinitylib.block.tile.InfinityTileEntityType;
-import com.infinityraider.infinitylib.block.tile.TileEntityBase;
+import com.infinityraider.infinitylib.utility.RayTraceHelper;
 import com.infinityraider.miney_games.client.render.ChessTableRenderer;
 import com.infinityraider.miney_games.content.ModTiles;
+import com.infinityraider.miney_games.core.TileMineyGame;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class TileChessTable extends TileEntityBase {
+public class TileChessTable extends TileMineyGame<BlockChessTable> {
+    private static final double RAY_TRACE_RANGE = 7.0;
+
     public TileChessTable(BlockPos pos, BlockState state) {
         super(ModTiles.getInstance().CHESS_TABLE_TILE.get(), pos, state);
     }
@@ -25,6 +32,43 @@ public class TileChessTable extends TileEntityBase {
     @Override
     public void tick() {
 
+    }
+
+    @Override
+    public BlockChessTable.Size getSize() {
+        return this.getBlock().getSize(this.getBlockState());
+    }
+
+    public Optional<HitResult> rayTrace(Player player) {
+        return RayTraceHelper.getTargetBlock(player, RAY_TRACE_RANGE);
+    }
+
+    public int getChessSquareIndexAbsX(Vec3 abs) {
+        return this.getChessSquareIndex(abs.x());
+    }
+
+    public int getChessSquareIndexAbsY(Vec3 abs) {
+        return this.getChessSquareIndex(abs.y());
+    }
+
+    public int getChessSquareIndexRelX(Vec3 rel) {
+        return this.getChessSquareIndex(this.getOrientation().xAbsToRel(rel.x(), rel.y(), this.getSize()));
+    }
+
+    public int getChessSquareIndexRelY(Vec3 rel) {
+        return this.getChessSquareIndex(this.getOrientation().yAbsToRel(rel.x(), rel.y(), this.getSize()));
+    }
+
+    public int getChessSquareIndex(double v) {
+        return this.getSize().getSquareIndex(v);
+    }
+
+    public double getChessSquareMin(int square) {
+        return this.getSize().getSquareMin(square);
+    }
+
+    public double getChessSquareMax(int square) {
+        return this.getSize().getSquareMax(square);
     }
 
     @Override
