@@ -43,12 +43,17 @@ public class TileChessTable extends TileMineyGame<BlockChessTable> {
         return RayTraceHelper.getTargetBlock(player, RAY_TRACE_RANGE);
     }
 
+    public Vec3 offsetAbs(Vec3 abs) {
+        BlockPos pos = this.getBlockPos().offset(-this.getAbsX(), 0, -this.getAbsY());
+        return abs.add(-pos.getX(), -pos.getY(), -pos.getZ());
+    }
+
     public int getChessSquareIndexAbsX(Vec3 abs) {
         return this.getChessSquareIndex(abs.x());
     }
 
     public int getChessSquareIndexAbsY(Vec3 abs) {
-        return this.getChessSquareIndex(abs.y());
+        return this.getChessSquareIndex(abs.z());
     }
 
     public int getChessSquareIndexRelX(Vec3 rel) {
