@@ -23,32 +23,32 @@ public class MineyGameSize {
         return this.depth;
     }
 
-    public int getAbsSizeX(BlockMineyGame.Orientation orientation) {
+    public int getAbsSizeX(Orientation orientation) {
         return switch (orientation) {
             case NORTH, SOUTH -> this.getWidth();
             case EAST, WEST -> this.getDepth();
         };
     }
 
-    public int getAbsSizeY(BlockMineyGame.Orientation orientation) {
+    public int getAbsSizeY(Orientation orientation) {
         return switch (orientation) {
             case NORTH, SOUTH -> this.getDepth();
             case EAST, WEST -> this.getWidth();
         };
     }
 
-    public Stream<BlockPos> stream(BlockMineyGame.Orientation orientation) {
+    public Stream<BlockPos> stream(Orientation orientation) {
         return this.stream(new BlockPos(0, 0, 0), orientation);
     }
 
-    public Stream<BlockPos> stream(BlockPos offset, BlockMineyGame.Orientation orientation) {
+    public Stream<BlockPos> stream(BlockPos offset, Orientation orientation) {
         return BlockPos.betweenClosedStream(
                 offset,
                 offset.offset(this.getAbsSizeX(orientation) - 1, 0, this.getAbsSizeY(orientation) - 1)
         );
     }
 
-    public Optional<BlockMineyGame.Orientation> matches(BlockPos min, BlockPos max, BlockMineyGame.Orientation closest) {
+    public Optional<Orientation> matches(BlockPos min, BlockPos max, Orientation closest) {
         int width = max.getX() - min.getX() + 1;
         int depth = max.getZ() - min.getZ() + 1;
         if(width == this.getWidth() && depth == this.getDepth()) {

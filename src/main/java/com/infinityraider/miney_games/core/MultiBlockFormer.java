@@ -16,7 +16,7 @@ public class MultiBlockFormer {
     private final Level world;
     private final BlockMineyGame<?> block;
 
-    private BlockMineyGame.Orientation orientation;
+    private Orientation orientation;
 
     private final List<BlockPos> toVisit;
     private final Set<BlockPos> visited;
@@ -25,7 +25,7 @@ public class MultiBlockFormer {
     private BlockPos min;
     private BlockPos max;
 
-    public MultiBlockFormer(Level world, BlockPos pos, BlockMineyGame<?> block, BlockMineyGame.Orientation orientation) {
+    public MultiBlockFormer(Level world, BlockPos pos, BlockMineyGame<?> block, Orientation orientation) {
         this.world = world;
         this.block = block;
         this.orientation = orientation;
@@ -44,11 +44,11 @@ public class MultiBlockFormer {
         return this.block;
     }
 
-    protected void setOrientation(BlockMineyGame.Orientation orientation) {
+    protected void setOrientation(Orientation orientation) {
         this.orientation = orientation;
     }
 
-    public BlockMineyGame.Orientation getOrientation() {
+    public Orientation getOrientation() {
         return this.orientation;
     }
 
