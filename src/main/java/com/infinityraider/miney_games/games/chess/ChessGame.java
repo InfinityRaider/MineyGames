@@ -77,6 +77,17 @@ public class ChessGame {
         this.status = ChessGameStatus.TIME_OUT;
     }
 
+    public Optional<ChessMove> getLastMove() {
+        if(this.currentMoves.isEmpty()) {
+            if(!this.turns.isEmpty()) {
+                return Optional.of(this.turns.get(this.turns.size() - 1).getLastMove());
+            }
+        } else {
+            return Optional.of(this.currentMoves.get(this.currentMoves.size() - 1));
+        }
+        return Optional.empty();
+    }
+
     protected void makeMove(ChessMove move) {
         // execute the move
         move.execute();
@@ -123,6 +134,10 @@ public class ChessGame {
         private Turn(int count, List<ChessMove> moves) {
             this.count = count;
             this.moves = moves;
+        }
+
+        public ChessMove getLastMove() {
+            return this.moves.get(this.moves.size() - 1);
         }
     }
 

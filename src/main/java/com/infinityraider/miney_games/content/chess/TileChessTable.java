@@ -7,7 +7,6 @@ import com.infinityraider.miney_games.content.ModTiles;
 import com.infinityraider.miney_games.core.TileMineyGame;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
@@ -15,23 +14,25 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class TileChessTable extends TileMineyGame<BlockChessTable> {
+public class TileChessTable extends TileMineyGame<BlockChessTable, ChessGameWrapper> {
     private static final double RAY_TRACE_RANGE = 7.0;
+
+    private final ChessGameWrapper game;
 
     public TileChessTable(BlockPos pos, BlockState state) {
         super(ModTiles.getInstance().CHESS_TABLE_TILE.get(), pos, state);
+        this.game = new ChessGameWrapper(this);
     }
 
     @Override
-    public void tick() {
-
+    protected ChessGameWrapper getWrapper() {
+        return this.game;
     }
 
     @Override
@@ -74,16 +75,6 @@ public class TileChessTable extends TileMineyGame<BlockChessTable> {
 
     public double getChessSquareMax(int square) {
         return this.getSize().getSquareMax(square);
-    }
-
-    @Override
-    protected void writeTileNBT(@Nonnull CompoundTag tag) {
-
-    }
-
-    @Override
-    protected void readTileNBT(@Nonnull CompoundTag tag) {
-
     }
 
     public static RenderFactory createRenderFactory() {

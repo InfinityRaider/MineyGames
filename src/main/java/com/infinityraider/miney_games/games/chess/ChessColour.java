@@ -1,6 +1,13 @@
 package com.infinityraider.miney_games.games.chess;
 
+import com.google.common.collect.Maps;
+
+import java.util.Map;
+
 public class ChessColour {
+    // all colours
+    private static final Map<String, ChessColour> COLOURS = Maps.newHashMap();
+
     // for two player chess
     public static final ChessColour WHITE = new ChessColour("white", PlayDirection.UP, 255, 255, 255);
     public static final ChessColour BLACK = new ChessColour("black", PlayDirection.DOWN,0, 0, 0);
@@ -23,6 +30,7 @@ public class ChessColour {
         this.r = r;
         this.g = g;
         this.b = b;
+        COLOURS.put(this.getName(), this);
     }
 
     public String getName() {
@@ -43,5 +51,9 @@ public class ChessColour {
 
     public int getB() {
         return this.b;
+    }
+
+    public static ChessColour fromName(String name) {
+        return COLOURS.get(name);
     }
 }

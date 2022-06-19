@@ -7,7 +7,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -16,6 +19,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +33,7 @@ import java.util.stream.Stream;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class BlockMineyGame<T extends TileMineyGame<?>> extends BlockBaseTile<T> {
+public abstract class BlockMineyGame<T extends TileMineyGame<?,?>> extends BlockBaseTile<T> {
 
     private Props props;
 
@@ -57,6 +61,15 @@ public abstract class BlockMineyGame<T extends TileMineyGame<?>> extends BlockBa
 
     public MineyGameSize getSize(BlockState state) {
         return this.getProps().getSize(state);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Optional<T> getMainTile(Level world, BlockPos pos, BlockState state) {
+        return Optional.ofNullable((T) world.getBlockEntity(this.getMainPos(pos, state)));
+    }
+
+    public BlockPos getMainPos(BlockPos pos, BlockState state) {
+        return pos.offset(-this.getAbsX(state), 0, -this.getAbsY(state));
     }
 
     public int getWidth(BlockState state) {
@@ -128,6 +141,15 @@ public abstract class BlockMineyGame<T extends TileMineyGame<?>> extends BlockBa
                     .filter(p -> !p.equals(pos))
                     .forEach(p -> world.setBlock(p, this.getProps().revert(world.getBlockState(p)), 3));
         }
+    }
+
+    @Override
+    @Deprecated
+    @SuppressWarnings("deprecation")
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        return this.getMainTile(world, pos, state)
+                .map(tile -> tile.onRightClick(player, hand, hit))
+                .orElse(InteractionResult.PASS);
     }
 
     public abstract VoxelShape getShape(BlockState state);

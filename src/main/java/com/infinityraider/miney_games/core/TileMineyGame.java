@@ -1,14 +1,39 @@
 package com.infinityraider.miney_games.core;
 
 import com.infinityraider.infinitylib.block.tile.TileEntityBase;
+import com.infinityraider.miney_games.reference.Names;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
-public abstract class TileMineyGame<B extends BlockMineyGame<?>> extends TileEntityBase {
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+public abstract class TileMineyGame<B extends BlockMineyGame<?>, W extends GameWrapper<?>> extends TileEntityBase {
     public TileMineyGame(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+    }
+
+    protected abstract W getWrapper();
+
+    @Override
+    public final void tick() {
+        this.getWrapper().tick();
+        this.onTick();
+    }
+
+    protected void onTick() {}
+
+    public final InteractionResult onRightClick(Player player, InteractionHand hand, BlockHitResult hit) {
+        return this.getWrapper().onRightClick(player, hand, hit);
     }
 
     @SuppressWarnings("unchecked")
@@ -55,4 +80,22 @@ public abstract class TileMineyGame<B extends BlockMineyGame<?>> extends TileEnt
     public Orientation getOrientation() {
         return this.getBlock().getOrientation(this.getBlockState());
     }
+
+    @Override
+    protected final void writeTileNBT(CompoundTag tag) {
+        this.getWrapper().writeToNBT(tag);
+        CompoundTag additional = new CompoundTag();
+        this.writeAdditionalNBT(tag);
+        tag.put(Names.NBT.ADDITIONAL, additional);
+    }
+
+    @Override
+    protected final void readTileNBT(CompoundTag tag) {
+        this.getWrapper().readFromNBT(tag);
+        this.readAdditionalNBT(tag.getCompound(Names.NBT.ADDITIONAL));
+    }
+
+    protected void writeAdditionalNBT(CompoundTag tag) {}
+
+    protected void readAdditionalNBT(CompoundTag tag) {}
 }

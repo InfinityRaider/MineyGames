@@ -7,11 +7,17 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 public interface IChessGameSettings {
-    int boardWidth();
+    default int boardWidth() {
+        return 8;
+    }
 
-    int boardHeight();
+    default int boardHeight() {
+        return 8;
+    }
 
-    BiFunction<Integer, Integer, ChessBoard.Square> boardInitializer();
+    default BiFunction<Integer, Integer, ChessBoard.Square> boardInitializer() {
+        return ChessBoard.Square::new;
+    }
 
     ChessClock createChessClock();
 
@@ -21,21 +27,6 @@ public interface IChessGameSettings {
 
     IChessGameSettings DEFAULT = new IChessGameSettings() {
         private final List<ChessColour> participants = ImmutableList.of(ChessColour.WHITE, ChessColour.BLACK);
-
-        @Override
-        public int boardWidth() {
-            return 8;
-        }
-
-        @Override
-        public int boardHeight() {
-            return 0;
-        }
-
-        @Override
-        public BiFunction<Integer, Integer, ChessBoard.Square> boardInitializer() {
-            return ChessBoard.Square::new;
-        }
 
         @Override
         public ChessClock createChessClock() {
