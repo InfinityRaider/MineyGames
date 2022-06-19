@@ -15,12 +15,11 @@ public class ChessGame {
 
     private final ChessBoard board;
     private final List<Participant> participants;
-    private final List<Turn> turns;
+    private final List<ChessMove> moves;
 
     private int currentTurn;
-
     private int currentParticipant;
-    private List<ChessMove> currentMoves;
+    private List<ChessMove> moveAccess;
 
     public ChessGame() {
         this(IChessGameSettings.DEFAULT);
@@ -30,7 +29,10 @@ public class ChessGame {
         this.status = ChessGameStatus.PREGAME;
         this.board = new ChessBoard(settings.boardInitializer(), settings.boardWidth(), settings.boardHeight());
         this.participants = settings.participants().stream().map(colour -> new Participant(this,  settings.createChessClock(), colour)).collect(Collectors.toList());
-        this.turns = Lists.newArrayList();
+        this.moves = Lists.newArrayList();
+        this.currentTurn = -1;
+        this.currentParticipant = -1;
+        this.moveAccess = ImmutableList.of();
         this.getBoard().forEach(square -> settings.pieceSetup(this, square));
     }
 
@@ -39,6 +41,8 @@ public class ChessGame {
     }
 
     public void start() {
+        this.currentTurn = 0;
+        this.currentParticipant = 0;
         this.getCurrentParticipant().scanPotentialMoves();
         this.status = ChessGameStatus.ONGOING;
         this.getCurrentParticipant().getClock().start();
@@ -73,35 +77,42 @@ public class ChessGame {
         return this.getCurrentParticipant().getPotentialMoves();
     }
 
+    public Optional<ChessMove> getPotentialMove(ChessBoard.Square from, ChessBoard.Square to) {
+        return this.getPotentialMoves().stream()
+                .filter(move -> move.fromSquare().equals(from))
+                .filter(move -> move.toSquare().equals(to))
+                .findAny();
+    }
+
     protected void onTimeUp(Participant participant) {
         this.status = ChessGameStatus.TIME_OUT;
     }
 
-    public Optional<ChessMove> getLastMove() {
-        if(this.currentMoves.isEmpty()) {
-            if(!this.turns.isEmpty()) {
-                return Optional.of(this.turns.get(this.turns.size() - 1).getLastMove());
-            }
-        } else {
-            return Optional.of(this.currentMoves.get(this.currentMoves.size() - 1));
-        }
-        return Optional.empty();
+    public List<ChessMove> getMoveHistory() {
+        return this.moveAccess;
     }
 
-    protected void makeMove(ChessMove move) {
+    public Optional<ChessMove> getLastMove() {
+        if(this.getMoveHistory().isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(this.getMoveHistory().get(this.moves.size() - 1));
+    }
+
+    public void makeMove(ChessMove move) {
         // execute the move
         move.execute();
         // notify the participant the move has been made
         this.getCurrentParticipant().onMoveMade(move);
-        // update the move and turn history
-        this.currentMoves.add(move);
-        if(currentMoves.size() == participants.size()) {
-            this.turns.add(new Turn(this.getCurrentTurn(), ImmutableList.copyOf(this.currentMoves)));
-            this.currentMoves = Lists.newArrayList();
-            this.currentTurn++;
+        // update the move history
+        this.moves.add(move);
+        this.moveAccess = ImmutableList.copyOf(this.moves);
+        // increment participant counter
+        this.currentParticipant++;
+        // increment turn counter if needed
+        if(this.currentParticipant == this.getParticipants().size() - 1) {
             this.currentParticipant = 0;
-        } else {
-            this.currentParticipant++;
+            this.currentTurn++;
         }
         // check if there is sufficient material to continue the game
         if(this.participants.stream().noneMatch(Participant::hasSufficientMaterial)) {
@@ -125,20 +136,6 @@ public class ChessGame {
 
     public int getCurrentTurn() {
         return this.currentTurn;
-    }
-
-    public static class Turn {
-        private int count;
-        private List<ChessMove> moves;
-
-        private Turn(int count, List<ChessMove> moves) {
-            this.count = count;
-            this.moves = moves;
-        }
-
-        public ChessMove getLastMove() {
-            return this.moves.get(this.moves.size() - 1);
-        }
     }
 
     public static class Participant implements ChessClock.ICallback {

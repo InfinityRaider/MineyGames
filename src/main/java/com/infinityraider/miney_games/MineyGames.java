@@ -1,9 +1,12 @@
 package com.infinityraider.miney_games;
 
 import com.infinityraider.infinitylib.InfinityMod;
+import com.infinityraider.infinitylib.network.INetworkWrapper;
 import com.infinityraider.infinitylib.utility.registration.ModContentRegistry;
 import com.infinityraider.miney_games.config.Config;
 import com.infinityraider.miney_games.content.*;
+import com.infinityraider.miney_games.network.chess.MessageSelectSquare;
+import com.infinityraider.miney_games.network.chess.MessageSyncChessMove;
 import com.infinityraider.miney_games.proxy.ClientProxy;
 import com.infinityraider.miney_games.proxy.IProxy;
 import com.infinityraider.miney_games.proxy.ServerProxy;
@@ -51,5 +54,11 @@ public class MineyGames extends InfinityMod<IProxy, Config> {
     @Override
     public ModContentRegistry getModTileRegistry() {
         return ModTiles.getInstance();
+    }
+
+    @Override
+    public void registerMessages(INetworkWrapper wrapper) {
+        wrapper.registerMessage(MessageSelectSquare.class);
+        wrapper.registerMessage(MessageSyncChessMove.class);
     }
 }

@@ -31,7 +31,7 @@ public class TileChessTable extends TileMineyGame<BlockChessTable, ChessGameWrap
     }
 
     @Override
-    protected ChessGameWrapper getWrapper() {
+    public ChessGameWrapper getWrapper() {
         return this.game;
     }
 

@@ -30,7 +30,7 @@ public interface IChessGameSettings {
 
         @Override
         public ChessClock createChessClock() {
-            return null;
+            return new ChessClock();
         }
 
         @Override
