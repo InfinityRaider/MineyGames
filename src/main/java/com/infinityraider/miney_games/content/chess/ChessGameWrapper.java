@@ -227,7 +227,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         this.game = game;
     }
 
-    private static class Participant {
+    public static class Participant {
         private final ChessGameWrapper game;
 
         private UUID id;
@@ -268,20 +268,49 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return this.colour;
         }
 
-        public void onSquareClicked(ChessBoard.Square square, Player player) {
+        protected void onSquareClicked(ChessBoard.Square square, Player player) {
             if(!this.isPlayer(player)) {
                 return;
             }
             if(this.selected == null) {
-                this.selected = square;
-                new MessageSelectSquare(this.getTable(), square).sendTo(player);
+                if(this.selectSquare(square)) {
+                    this.selected = square;
+                    new MessageSelectSquare(this.getTable(), square).sendTo(player);
+                }
             } else {
                 if(this.selected.equals(square)) {
-                    this.selected = null;
+                    this.deselectSquare();
+                    new MessageSelectSquare(this.getTable()).sendTo(player);
                 } else if(this.makeMove(square)) {
                     this.selected = null;
                 }
             }
+        }
+
+        public void deselectSquare() {
+            this.selected = null;
+        }
+
+        public boolean selectSquare(int x, int y) {
+            return this.getGame().map(ChessGame::getBoard)
+                    .flatMap(board -> board.getSquare(x, y))
+                    .map(this::selectSquare)
+                    .orElse(false);
+        }
+
+        public boolean selectSquare(ChessBoard.Square square) {
+            if(this.canSelect(square)) {
+                this.selected = square;
+                return true;
+            }
+            return false;
+        }
+
+        protected boolean canSelect(ChessBoard.Square square) {
+            return square.getPiece()
+                    .map(ChessPiece::getColour)
+                    .map(colour -> colour.getName().equals(this.getColour().getName()))
+                    .orElse(false);
         }
 
         protected boolean makeMove(ChessBoard.Square to) {
