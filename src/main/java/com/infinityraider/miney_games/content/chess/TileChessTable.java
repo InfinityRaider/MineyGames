@@ -32,7 +32,12 @@ public class TileChessTable extends TileMineyGame<BlockChessTable, ChessGameWrap
 
     @Override
     public ChessGameWrapper getWrapper() {
-        return this.game;
+        if(this.getLevel() == null) {
+            return this.game;
+        }
+        return this.getBlock().getMainTile(this.getLevel(), this.getBlockPos(), this.getBlockState())
+                .map(TileChessTable::getWrapper)
+                .orElse(this.game);
     }
 
     @Override

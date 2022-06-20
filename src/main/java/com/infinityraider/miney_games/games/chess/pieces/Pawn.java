@@ -1,6 +1,5 @@
 package com.infinityraider.miney_games.games.chess.pieces;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.infinityraider.miney_games.games.chess.*;
 
@@ -8,12 +7,15 @@ import java.util.Optional;
 import java.util.Set;
 
 public class Pawn extends ChessPiece.Type {
-    private static final Set<ChessPiece.Type> VALID_PROMOTIONS = ImmutableSet.of(
-            ChessPiece.Pieces.ROOK,
-            ChessPiece.Pieces.KNIGHT,
-            ChessPiece.Pieces.BISHOP,
-            ChessPiece.Pieces.QUEEN
-    );
+    private static final ChessPiece.Type INSTANCE = new Pawn();
+
+    public static ChessPiece.Type getInstance() {
+        return INSTANCE;
+    }
+
+    private Pawn() {
+        super("pawn", 1);
+    }
 
     @Override
     protected boolean canFinishGame() {

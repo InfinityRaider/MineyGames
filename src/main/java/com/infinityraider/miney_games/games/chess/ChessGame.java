@@ -2,12 +2,10 @@ package com.infinityraider.miney_games.games.chess;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ChessGame {
@@ -107,6 +105,8 @@ public class ChessGame {
         // update the move history
         this.moves.add(move);
         this.moveAccess = ImmutableList.copyOf(this.moves);
+        // update the moves of the previous participant
+        this.getCurrentParticipant().scanPotentialMoves();
         // increment participant counter
         this.currentParticipant++;
         // increment turn counter if needed
@@ -138,6 +138,10 @@ public class ChessGame {
         return this.currentTurn;
     }
 
+    protected void onPieceAdded(ChessPiece piece) {
+        this.getParticipant(piece.getColour()).addPiece(piece);
+    }
+
     public static class Participant implements ChessClock.ICallback {
         private final ChessGame game;
         private final ChessClock clock;
@@ -145,6 +149,8 @@ public class ChessGame {
 
         private final List<ChessMove> moves;
         private final Set<ChessMove> potentialMoves;
+        private final Map<String, Set<ChessPiece>> pieces;
+        private final Set<ChessPiece> captured;
 
         private boolean mated;
         private boolean timeUp;
@@ -155,6 +161,12 @@ public class ChessGame {
             this.colour = colour;
             this.moves = Lists.newArrayList();
             this.potentialMoves = Sets.newIdentityHashSet();
+            this.pieces = Maps.newHashMap();
+            this.captured = Sets.newIdentityHashSet();
+        }
+
+        protected void addPiece(ChessPiece piece) {
+            this.pieces.computeIfAbsent(piece.getName(), name -> Sets.newIdentityHashSet()).add(piece);
         }
 
         public Set<ChessMove> getPotentialMoves() {
@@ -169,6 +181,9 @@ public class ChessGame {
             this.getClock().stop();
             this.moves.add(move);
             this.potentialMoves.clear();
+            if(move.hasCaptures()) {
+                move.getCaptures().forEach(this.captured::add);
+            }
         }
 
         public ChessGame getGame() {
@@ -203,10 +218,14 @@ public class ChessGame {
         }
 
         protected Participant scanPotentialMoves() {
+            // clear the potential moves
             this.potentialMoves.clear();
+            // notify the pieces of the scan
+            this.pieces.values().forEach(set -> set.forEach(ChessPiece::preMoveScan));
+            // execute the scan
             this.getBoard().streamPieces()
                     .filter(piece -> piece.getColour() == this.getColour())
-                    .map(ChessPiece::getPotentialMoves)
+                    .map(ChessPiece::scanPotentialMoves)
                     .flatMap(Collection::stream)
                     .filter(move -> {
                         // simulate the move to check if a check is occurring
@@ -224,7 +243,15 @@ public class ChessGame {
             return this;
         }
 
-        protected boolean isKingAttacked() {
+        public Set<ChessPiece> getPieces(ChessPiece.Type type) {
+            return this.pieces.computeIfAbsent(type.getName(), name -> Sets.newHashSet());
+        }
+
+        public Set<ChessPiece> getCapturedPieces() {
+            return this.captured;
+        }
+
+        public boolean isKingAttacked() {
             return this.getBoard().streamPieces()
                     // iterate over all pieces of different colours
                     .filter(piece -> piece.getColour() != this.getColour())

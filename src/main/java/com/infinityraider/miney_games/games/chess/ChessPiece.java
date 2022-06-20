@@ -1,9 +1,12 @@
 package com.infinityraider.miney_games.games.chess;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.infinityraider.miney_games.games.chess.pieces.*;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -15,9 +18,9 @@ public class ChessPiece {
 
     private ChessBoard.Square square;
     private final List<ChessMove> moves;
+    private final Set<ChessMove> potentialMoves;
     private boolean isCaptured;
-
-    private Set<ChessColour> checking;
+    private boolean attacked;
 
     public ChessPiece(ChessGame game, ChessColour colour, Type type, ChessBoard.Square square) {
         this.game = game;
@@ -25,7 +28,12 @@ public class ChessPiece {
         this.type = type;
         this.square = square;
         this.moves = Lists.newArrayList();
+        this.potentialMoves = Sets.newIdentityHashSet();
         this.isCaptured = false;
+    }
+
+    public String getName() {
+        return this.getType().getName();
     }
 
     public ChessGame getGame() {
@@ -46,6 +54,10 @@ public class ChessPiece {
 
     public Type getType() {
         return this.type;
+    }
+
+    public int getWorth() {
+        return this.getType().getWorth();
     }
 
     public ChessBoard.Square currentSquare() {
@@ -80,8 +92,23 @@ public class ChessPiece {
         return this.isCaptured;
     }
 
+    protected Set<ChessMove> scanPotentialMoves() {
+        this.potentialMoves.clear();
+        this.getType().getPotentialMoves(this).stream()
+                .peek(move -> {
+                    if(move.hasCaptures()) {
+                        move.getCaptures().forEach(ChessPiece::setAttacked);
+                    }})
+                .forEach(this.potentialMoves::add);
+        return this.getPotentialMoves();
+    }
+
     public Set<ChessMove> getPotentialMoves() {
-        return this.getType().getPotentialMoves(this);
+        return this.potentialMoves;
+    }
+
+    private void setAttacked() {
+        this.attacked = true;
     }
 
     void onMove(ChessMove move) {
@@ -103,7 +130,30 @@ public class ChessPiece {
         this.square = square;
     }
 
+    protected void preMoveScan() {
+        this.attacked = false;
+    }
+
     public static abstract class Type {
+        private static final Map<String, Type> TYPES = Maps.newHashMap();
+
+        private final String name;
+        private final int worth;
+
+        protected Type(String name, int worth) {
+            this.name = name;
+            this.worth = worth;
+            TYPES.put(this.getName(), this);
+        }
+
+        public final String getName() {
+            return this.name;
+        }
+
+        public final int getWorth() {
+            return this.worth;
+        }
+
         protected  abstract boolean canFinishGame();
 
         protected abstract Set<ChessMove> getPotentialMoves(ChessPiece piece);
@@ -119,7 +169,7 @@ public class ChessPiece {
                 // check the square
                 flag = this.checkSquare(piece, x, y).map(move -> {
                     consumer.accept(move);
-                    return !move.hasCaptured();
+                    return !move.hasCaptures();
                 }).orElse(false);
             }
         }
@@ -147,11 +197,15 @@ public class ChessPiece {
     }
 
     public static class Pieces {
-        public static final Type PAWN = new Pawn();
-        public static final Type ROOK = new Rook();
-        public static final Type KNIGHT = new Knight();
-        public static final Type BISHOP = new Bishop();
-        public static final Type QUEEN = new Queen();
-        public static final Type KING = new King();
+        public static Type fromName(String name) {
+            return Type.TYPES.get(name);
+        }
+
+        public static final Type PAWN = Pawn.getInstance();
+        public static final Type ROOK = Rook.getInstance();
+        public static final Type KNIGHT = Knight.getInstance();
+        public static final Type BISHOP = Bishop.getInstance();
+        public static final Type QUEEN = Queen.getInstance();
+        public static final Type KING = King.getInstance();
     }
 }

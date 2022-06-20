@@ -7,6 +7,16 @@ import com.infinityraider.miney_games.games.chess.ChessPiece;
 import java.util.Set;
 
 public class Bishop extends ChessPiece.Type {
+    private static final ChessPiece.Type INSTANCE = new Bishop();
+
+    public static ChessPiece.Type getInstance() {
+        return INSTANCE;
+    }
+
+    private Bishop() {
+        super("bishop", 3);
+    }
+
     @Override
     protected boolean canFinishGame() {
         return false;

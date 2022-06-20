@@ -164,6 +164,7 @@ public class ChessBoard {
 
         public Square setPiece(ChessPiece piece) {
             this.piece = piece;
+            piece.getGame().onPieceAdded(piece);
             return this;
         }
 

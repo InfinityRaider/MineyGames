@@ -7,6 +7,16 @@ import com.infinityraider.miney_games.games.chess.ChessPiece;
 import java.util.Set;
 
 public class Knight extends ChessPiece.Type {
+    private static final ChessPiece.Type INSTANCE = new Knight();
+
+    public static ChessPiece.Type getInstance() {
+        return INSTANCE;
+    }
+
+    private Knight() {
+        super("knight", 3);
+    }
+
     @Override
     protected boolean canFinishGame() {
         return false;

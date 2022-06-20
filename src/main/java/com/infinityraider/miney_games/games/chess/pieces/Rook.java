@@ -7,6 +7,16 @@ import com.infinityraider.miney_games.games.chess.ChessPiece;
 import java.util.Set;
 
 public class Rook extends ChessPiece.Type {
+    private static final ChessPiece.Type INSTANCE = new Rook();
+
+    public static ChessPiece.Type getInstance() {
+        return INSTANCE;
+    }
+
+    private Rook() {
+        super("rook", 5);
+    }
+
     @Override
     protected boolean canFinishGame() {
         return true;

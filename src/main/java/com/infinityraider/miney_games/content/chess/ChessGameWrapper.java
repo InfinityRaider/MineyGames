@@ -1,5 +1,7 @@
 package com.infinityraider.miney_games.content.chess;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.core.GameWrapper;
 import com.infinityraider.miney_games.games.chess.*;
@@ -17,9 +19,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ChessGameWrapper extends GameWrapper<ChessGame> {
     private final TileChessTable table;
@@ -79,6 +81,12 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                     }
                 }));
         return InteractionResult.PASS;
+    }
+
+    public boolean isRunning() {
+        return this.getGame().map(ChessGame::getStatus)
+                .map(ChessGameStatus::isGoing)
+                .orElse(false);
     }
 
     public boolean isPlayer1(Player player) {
@@ -244,8 +252,12 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return this.game;
         }
 
-        public Optional<ChessGame> getGame() {
+        protected Optional<ChessGame> getGame() {
             return this.getWrapper().getGame();
+        }
+
+        protected Optional<ChessGame.Participant> getParticipant() {
+            return this.getGame().map(game -> game.getParticipant(this.getColour()));
         }
 
         public TileChessTable getTable() {
@@ -264,8 +276,29 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return this.hasPlayer() && this.id.equals(player.getUUID());
         }
 
+        public boolean isColour(ChessColour colour) {
+            return this.getColour().getName().equals(colour.getName());
+        }
+
         public ChessColour getColour() {
             return this.colour;
+        }
+
+        public Stream<Square> getPiecesOnBoard(String piece) {
+            return this.getPiecesOnBoard(Piece.wrapPiece(piece));
+        }
+
+        public Stream<Square> getPiecesOnBoard(Piece piece) {
+            return this.getParticipant()
+                    .map(participant -> participant.getPieces(piece.getType()))
+                    .map(pieces -> pieces.stream()
+                            .filter(p -> !p.isCaptured())
+                            .map(Square::new))
+                    .orElse(Stream.empty());
+        }
+
+        public boolean isAttacked(Square square) {
+            // TODO
         }
 
         protected void onSquareClicked(ChessBoard.Square square, Player player) {
@@ -311,6 +344,28 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                     .map(ChessPiece::getColour)
                     .map(colour -> colour.getName().equals(this.getColour().getName()))
                     .orElse(false);
+        }
+
+        public boolean hasSelected() {
+            return this.selected != null;
+        }
+
+        public int getSelectedX() {
+            return this.hasSelected() ? this.selected.getX() : -1;
+        }
+
+        public int getSelectedY() {
+            return this.hasSelected() ? this.selected.getY() : -1;
+        }
+
+        public List<Square> getPotentialMovesForSelected() {
+            if(this.hasSelected()) {
+                return this.selected.getPiece()
+                        .map(ChessPiece::getPotentialMoves)
+                        .map(moves -> moves.stream().map(Square::new).collect(Collectors.toList()))
+                        .orElse(ImmutableList.of());
+            }
+            return ImmutableList.of();
         }
 
         protected boolean makeMove(ChessBoard.Square to) {
@@ -363,6 +418,70 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
 
         public void readFromTag(CompoundTag tag) {
             // TODO
+        }
+    }
+
+    public static class Square {
+        private final int x;
+        private final int y;
+
+        private Square(ChessMove move) {
+            this(move.toSquare());
+        }
+
+        private Square(ChessPiece piece) {
+            this(piece.currentSquare());
+        }
+
+        private Square(ChessBoard.Square square) {
+            this(square.getX(), square.getY());
+        }
+
+        private Square(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public int getX() {
+            return this.x;
+        }
+
+        public int getY() {
+            return this.y;
+        }
+    }
+
+    public static class Piece {
+        private static final Map<String, Piece> PIECES = Maps.newHashMap();
+
+        private static Piece wrapPiece(ChessPiece piece) {
+            return wrapPiece(piece.getType());
+        }
+
+        private static Piece wrapPiece(ChessPiece.Type piece) {
+            return wrapPiece(piece.getName());
+        }
+
+        private static Piece wrapPiece(String piece) {
+            return PIECES.computeIfAbsent(piece, name -> new Piece(ChessPiece.Pieces.fromName(name)));
+        }
+
+        private final ChessPiece.Type type;
+
+        private Piece(ChessPiece piece) {
+            this(piece.getType());
+        }
+
+        private Piece(ChessPiece.Type type) {
+            this.type = type;
+        }
+
+        protected ChessPiece.Type getType() {
+            return this.type;
+        }
+
+        public String getName() {
+            return this.type.getName();
         }
     }
 }

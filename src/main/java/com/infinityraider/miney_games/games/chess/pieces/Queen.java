@@ -7,6 +7,16 @@ import com.infinityraider.miney_games.games.chess.ChessPiece;
 import java.util.Set;
 
 public class Queen extends ChessPiece.Type {
+    private static final ChessPiece.Type INSTANCE = new Queen();
+
+    public static ChessPiece.Type getInstance() {
+        return INSTANCE;
+    }
+
+    private Queen() {
+        super("queen", 9);
+    }
+
     @Override
     protected boolean canFinishGame() {
         return true;

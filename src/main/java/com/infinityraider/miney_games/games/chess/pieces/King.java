@@ -10,6 +10,16 @@ import java.util.Optional;
 import java.util.Set;
 
 public class King extends ChessPiece.Type {
+    private static final ChessPiece.Type INSTANCE = new King();
+
+    public static ChessPiece.Type getInstance() {
+        return INSTANCE;
+    }
+
+    private King() {
+        super("king", 20);
+    }
+
     @Override
     protected boolean canFinishGame() {
         return false;

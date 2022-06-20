@@ -3,6 +3,7 @@ package com.infinityraider.miney_games.games.chess;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class ChessMove {
     public static ChessMove move(ChessPiece piece, ChessBoard.Square to) {
@@ -32,14 +33,14 @@ public class ChessMove {
         this.captures = captures;
     }
 
-    public void execute() {
+    protected void execute() {
         this.captures.forEach(Capture::execute);
         this.fromSquare().removePiece();
         this.toSquare().setPiece(this.getPiece());
         this.getPiece().onMove(this);
     }
 
-    public void undo() {
+    protected void undo() {
         this.toSquare().removePiece();
         this.fromSquare().setPiece(this.getPiece());
         this.captures.forEach(Capture::undo);
@@ -62,8 +63,12 @@ public class ChessMove {
         return this.to;
     }
 
-    public boolean hasCaptured() {
+    public boolean hasCaptures() {
         return !this.captures.isEmpty();
+    }
+
+    public Stream<ChessPiece> getCaptures() {
+        return this.captures.stream().map(Capture::getPiece);
     }
 
     protected static class Capture {
