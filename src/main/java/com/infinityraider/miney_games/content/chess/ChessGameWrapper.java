@@ -1,7 +1,5 @@
 package com.infinityraider.miney_games.content.chess;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.core.GameWrapper;
 import com.infinityraider.miney_games.games.chess.*;
@@ -9,6 +7,7 @@ import com.infinityraider.miney_games.network.chess.MessageSelectSquare;
 import com.infinityraider.miney_games.network.chess.MessageSyncChessMove;
 import com.infinityraider.miney_games.reference.Names;
 import net.minecraft.Util;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -20,8 +19,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.List;
 
 public class ChessGameWrapper extends GameWrapper<ChessGame> {
     private final TileChessTable table;
@@ -256,6 +254,14 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return this.getWrapper().getGame();
         }
 
+        protected Optional<ChessBoard> getBoard() {
+            return this.getGame().map(ChessGame::getBoard);
+        }
+
+        protected Optional<ChessBoard.Square> getSquare(int x, int y) {
+            return this.getBoard().flatMap(board -> board.getSquare(x, y));
+        }
+
         protected Optional<ChessGame.Participant> getParticipant() {
             return this.getGame().map(game -> game.getParticipant(this.getColour()));
         }
@@ -276,29 +282,8 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return this.hasPlayer() && this.id.equals(player.getUUID());
         }
 
-        public boolean isColour(ChessColour colour) {
-            return this.getColour().getName().equals(colour.getName());
-        }
-
         public ChessColour getColour() {
             return this.colour;
-        }
-
-        public Stream<Square> getPiecesOnBoard(String piece) {
-            return this.getPiecesOnBoard(Piece.wrapPiece(piece));
-        }
-
-        public Stream<Square> getPiecesOnBoard(Piece piece) {
-            return this.getParticipant()
-                    .map(participant -> participant.getPieces(piece.getType()))
-                    .map(pieces -> pieces.stream()
-                            .filter(p -> !p.isCaptured())
-                            .map(Square::new))
-                    .orElse(Stream.empty());
-        }
-
-        public boolean isAttacked(Square square) {
-            // TODO
         }
 
         protected void onSquareClicked(ChessBoard.Square square, Player player) {
@@ -350,29 +335,73 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return this.selected != null;
         }
 
-        public int getSelectedX() {
-            return this.hasSelected() ? this.selected.getX() : -1;
-        }
-
-        public int getSelectedY() {
-            return this.hasSelected() ? this.selected.getY() : -1;
-        }
-
-        public List<Square> getPotentialMovesForSelected() {
-            if(this.hasSelected()) {
-                return this.selected.getPiece()
-                        .map(ChessPiece::getPotentialMoves)
-                        .map(moves -> moves.stream().map(Square::new).collect(Collectors.toList()))
-                        .orElse(ImmutableList.of());
-            }
-            return ImmutableList.of();
-        }
-
         protected boolean makeMove(ChessBoard.Square to) {
             if(this.selected != null) {
                 return this.getWrapper().makeMoveServer(this.selected, to);
             }
             return false;
+        }
+
+        public Optional<Vec3i> getHighLightColour(int relX, int relY, boolean hovered) {
+            // first check if the square contains a king which is in check
+            boolean check = this.getSquare(relX, relY)
+                    .flatMap(ChessBoard.Square::getPiece)
+                    .map(piece -> piece.getType() == ChessPiece.Pieces.KING && piece.isAttacked())
+                    .orElse(false);
+            if (check) {
+                // the king is in check
+                return Optional.of(hovered || this.selected.is(relX, relY)
+                        // if the king is selected or hovered over, mark it purple
+                        ? HighLights.PURPLE
+                        // if the king is not selected or hovered over, mark it red
+                        : HighLights.RED
+                );
+            }
+            // the square does not contain a king or is not in check, go back to normal logic
+            if (this.hasSelected()) {
+                // there is a selected square
+                if (this.selected.is(relX, relY)) {
+                    // hovered over the currently selected square, mark it blue
+                    return Optional.of(HighLights.BLUE);
+                } else {
+                    // a piece is selected, decide based on hover and selection status
+                    return this.selected.getPiece().flatMap(piece -> {
+                        // first check if the square is a valid move for the selected piece
+                        boolean valid = piece.getPotentialMoves().stream()
+                                .map(ChessMove::toSquare)
+                                .anyMatch(square -> square.is(relX, relY));
+                        if (hovered) {
+                            // the square is being hovered over, if it is a valid move return cyan, else return orange
+                            return Optional.of(valid ? HighLights.CYAN : HighLights.ORANGE);
+                        } else if (valid) {
+                            // the square is not being hovered over but is valid, mark it in green
+                            return Optional.of(HighLights.GREEN);
+                        }
+                        // default to no highlighting
+                        return Optional.empty();
+                    });
+                }
+            } else {
+                // there is no selected square
+                return this.getSquare(relX, relY).map(square -> {
+                    // check if there is a piece
+                    return square.getPiece().map(piece -> {
+                        if (piece.isColour(this.getColour())) {
+                            if (piece.getPotentialMoves().isEmpty()) {
+                                // hovering over a piece without valid moves; highlight yellow
+                                return HighLights.YELLOW;
+                            } else {
+                                // hovering over a piece wiht valid moves; highlight green
+                                return HighLights.GREEN;
+                            }
+                        } else {
+                            // hovering over a piece of a different colour; highlight orange
+                            return HighLights.ORANGE;
+                        }
+                    // hovered over an arbitrary square, highlight in blue
+                    }).orElse(HighLights.BLUE);
+                });
+            }
         }
 
         protected CompoundTag writeToNBT() {
@@ -392,6 +421,16 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             this.score = tag.getInt(Names.NBT.SCORE);
             this.selected = this.getWrapper().getSquare(tag.getInt(Names.NBT.X), tag.getInt(Names.NBT.Y)).orElse(null);
         }
+    }
+
+    private static final class HighLights {
+        public static final Vec3i BLUE = new Vec3i(0, 0, 255);
+        public static final Vec3i CYAN = new Vec3i(0, 128, 128);
+        public static final Vec3i ORANGE = new Vec3i(255, 128, 0);
+        public static final Vec3i GREEN = new Vec3i(0, 255, 0);
+        public static final Vec3i RED = new Vec3i(255, 0, 0);
+        public static final Vec3i PURPLE = new Vec3i(128, 0, 128);
+        public static final Vec3i YELLOW = new Vec3i(255, 255, 0);
     }
 
     private static class Settings implements IChessGameSettings {
@@ -418,70 +457,6 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
 
         public void readFromTag(CompoundTag tag) {
             // TODO
-        }
-    }
-
-    public static class Square {
-        private final int x;
-        private final int y;
-
-        private Square(ChessMove move) {
-            this(move.toSquare());
-        }
-
-        private Square(ChessPiece piece) {
-            this(piece.currentSquare());
-        }
-
-        private Square(ChessBoard.Square square) {
-            this(square.getX(), square.getY());
-        }
-
-        private Square(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int getX() {
-            return this.x;
-        }
-
-        public int getY() {
-            return this.y;
-        }
-    }
-
-    public static class Piece {
-        private static final Map<String, Piece> PIECES = Maps.newHashMap();
-
-        private static Piece wrapPiece(ChessPiece piece) {
-            return wrapPiece(piece.getType());
-        }
-
-        private static Piece wrapPiece(ChessPiece.Type piece) {
-            return wrapPiece(piece.getName());
-        }
-
-        private static Piece wrapPiece(String piece) {
-            return PIECES.computeIfAbsent(piece, name -> new Piece(ChessPiece.Pieces.fromName(name)));
-        }
-
-        private final ChessPiece.Type type;
-
-        private Piece(ChessPiece piece) {
-            this(piece.getType());
-        }
-
-        private Piece(ChessPiece.Type type) {
-            this.type = type;
-        }
-
-        protected ChessPiece.Type getType() {
-            return this.type;
-        }
-
-        public String getName() {
-            return this.type.getName();
         }
     }
 }

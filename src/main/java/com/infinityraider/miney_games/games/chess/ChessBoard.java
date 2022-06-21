@@ -133,6 +133,10 @@ public class ChessBoard {
             return this.y;
         }
 
+        public boolean is(int x, int y) {
+            return this.getX() == x && this.getY() == y;
+        }
+
         public String getCoordinates() {
             return this.coordinates;
         }

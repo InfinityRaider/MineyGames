@@ -77,6 +77,12 @@ public class BlockChessTable extends BlockMineyGame<TileChessTable> {
             super(width, width);
         }
 
+        public double getSquareSize() {
+            double min = this.getBoardMin();
+            double max = this.getBoardMax();
+            return  (max - min)/SQUARES;
+        }
+
         public double getBoardMin() {
             return (0.0 + MARGIN*this.getWidth())/TEX_SIZE;
         }

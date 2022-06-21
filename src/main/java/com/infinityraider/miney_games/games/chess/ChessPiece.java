@@ -48,6 +48,10 @@ public class ChessPiece {
         return this.colour;
     }
 
+    public boolean isColour(ChessColour colour) {
+        return colour.getName().equals(this.getColour().getName());
+    }
+
     public PlayDirection getDirection() {
         return this.getColour().getDirection();
     }
@@ -90,6 +94,10 @@ public class ChessPiece {
 
     public boolean isCaptured() {
         return this.isCaptured;
+    }
+
+    public boolean isAttacked() {
+        return this.attacked;
     }
 
     protected Set<ChessMove> scanPotentialMoves() {

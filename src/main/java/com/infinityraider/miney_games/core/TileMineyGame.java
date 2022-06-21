@@ -81,6 +81,38 @@ public abstract class TileMineyGame<B extends BlockMineyGame<?>, W extends GameW
         return this.getBlock().getOrientation(this.getBlockState());
     }
 
+    public int xRelToAbs(int xRel, int yRel) {
+        return this.getOrientation().xRelToAbs(xRel, yRel, this.getSize());
+    }
+
+    public int yRelToAbs(int xRel, int yRel) {
+        return this.getOrientation().yRelToAbs(xRel, yRel, this.getSize());
+    }
+
+    public int xAbsToRel(int xAbs, int yAbs) {
+        return this.getOrientation().xAbsToRel(xAbs, yAbs, this.getSize());
+    }
+
+    public int yAbsToRel(int xAbs, int yAbs) {
+        return this.getOrientation().yAbsToRel(xAbs, yAbs, this.getSize());
+    }
+
+    public double xRelToAbs(double xRel, double yRel) {
+        return this.getOrientation().xRelToAbs(xRel, yRel, this.getSize());
+    }
+
+    public double yRelToAbs(double xRel, double yRel) {
+        return this.getOrientation().yRelToAbs(xRel, yRel, this.getSize());
+    }
+
+    public double xAbsToRel(double xAbs, double yAbs) {
+        return this.getOrientation().xAbsToRel(xAbs, yAbs, this.getSize());
+    }
+
+    public double yAbsToRel(double xAbs, double yAbs) {
+        return this.getOrientation().yAbsToRel(xAbs, yAbs, this.getSize());
+    }
+
     @Override
     protected final void writeTileNBT(CompoundTag tag) {
         this.getWrapper().writeToNBT(tag);

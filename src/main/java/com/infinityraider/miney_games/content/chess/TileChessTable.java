@@ -63,11 +63,11 @@ public class TileChessTable extends TileMineyGame<BlockChessTable, ChessGameWrap
     }
 
     public int getChessSquareIndexRelX(Vec3 rel) {
-        return this.getChessSquareIndex(this.getOrientation().xAbsToRel(rel.x(), rel.y(), this.getSize()));
+        return this.getChessSquareIndex(this.xAbsToRel(rel.x(), rel.y()));
     }
 
     public int getChessSquareIndexRelY(Vec3 rel) {
-        return this.getChessSquareIndex(this.getOrientation().yAbsToRel(rel.x(), rel.y(), this.getSize()));
+        return this.getChessSquareIndex(this.yAbsToRel(rel.x(), rel.y()));
     }
 
     public int getChessSquareIndex(double v) {
