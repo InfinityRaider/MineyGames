@@ -70,15 +70,31 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         if(player.getLevel().isClientSide()) {
             return InteractionResult.PASS;
         }
-        this.asParticipant(player).ifPresent(participant -> this.getGame()
-                .map(ChessGame::getCurrentParticipant)
-                .map(ChessGame.Participant::getColour)
-                .ifPresent(colour -> {
-                    if(colour.getName().equals(participant.getColour().getName())) {
-                        this.getSquare(hit).ifPresent(square -> participant.onSquareClicked(square, player));
-                    }
-                }));
+        if(player.isDiscrete()) {
+            // TODO: open the GUI, currently just toggle the players for testing
+            togglePlayerDebug(this.getPlayer1(), player);
+            togglePlayerDebug(this.getPlayer2(), player);
+        } else {
+            this.asParticipant(player).ifPresent(participant -> this.getGame()
+                    .map(ChessGame::getCurrentParticipant)
+                    .map(ChessGame.Participant::getColour)
+                    .ifPresent(colour -> {
+                        if (colour.getName().equals(participant.getColour().getName())) {
+                            this.getSquare(hit).ifPresent(square -> participant.onSquareClicked(square, player));
+                        }
+                    }));
+        }
         return InteractionResult.PASS;
+    }
+
+    private static void togglePlayerDebug(Participant participant, Player player) {
+        if(participant.hasPlayer()) {
+            if(participant.isPlayer(player)) {
+                participant.removePlayer();
+            }
+        } else {
+            participant.setPlayer(player);
+        }
     }
 
     public boolean isRunning() {
@@ -268,6 +284,10 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
 
         public TileChessTable getTable() {
             return this.getWrapper().getTable();
+        }
+
+        public void removePlayer() {
+            this.id = null;
         }
 
         public void setPlayer(Player player) {
