@@ -105,11 +105,11 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         return Optional.empty();
     }
 
-    public Optional<ChessMove> getLastMove() {
+    protected Optional<ChessMove> getLastMove() {
         return this.getGame().flatMap(ChessGame::getLastMove);
     }
 
-    public Optional<ChessBoard.Square> getSquare(BlockHitResult hit) {
+    protected Optional<ChessBoard.Square> getSquare(BlockHitResult hit) {
         if(hit.getType() == HitResult.Type.MISS) {
             return Optional.empty();
         }
@@ -120,7 +120,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         );
     }
 
-    public Optional<ChessBoard.Square> getSquare(int x, int y) {
+    protected Optional<ChessBoard.Square> getSquare(int x, int y) {
         if(x < 0 || y < 0) {
             return Optional.empty();
         }
@@ -170,7 +170,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
     }
 
     @Override
-    public void writeToNBT(CompoundTag tag) {
+    protected void writeToNBT(CompoundTag tag) {
         tag.put(Names.NBT.SETTINGS, this.getSettings().writeToTag());
         tag.put(Names.NBT.GAME, this.writeChessGame());
         tag.put(Names.NBT.PLAYER_1, this.getPlayer1().writeToNBT());
@@ -178,7 +178,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
     }
 
     @Override
-    public void readFromNBT(CompoundTag tag) {
+    protected void readFromNBT(CompoundTag tag) {
         this.getSettings().readFromTag(tag.getCompound(Names.NBT.SETTINGS));
         this.readChessGame(tag.getCompound(Names.NBT.GAME));
         this.getPlayer1().readFromNBT(tag.getCompound(Names.NBT.PLAYER_1));
@@ -282,7 +282,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return this.hasPlayer() && this.id.equals(player.getUUID());
         }
 
-        public ChessColour getColour() {
+        protected ChessColour getColour() {
             return this.colour;
         }
 
@@ -316,7 +316,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                     .orElse(false);
         }
 
-        public boolean selectSquare(ChessBoard.Square square) {
+        protected boolean selectSquare(ChessBoard.Square square) {
             if(this.canSelect(square)) {
                 this.selected = square;
                 return true;
