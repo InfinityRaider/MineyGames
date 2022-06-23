@@ -10,6 +10,8 @@ import com.infinityraider.miney_games.proxy.*;
 import com.infinityraider.miney_games.reference.Reference;
 import net.minecraftforge.fml.common.Mod;
 
+import javax.annotation.Nullable;
+
 @Mod(Reference.MOD_ID)
 public class MineyGames extends InfinityMod<IProxy, Config> {
     public static MineyGames instance;
@@ -51,6 +53,12 @@ public class MineyGames extends InfinityMod<IProxy, Config> {
     @Override
     public ModContentRegistry getModTileRegistry() {
         return ModTiles.getInstance();
+    }
+
+    @Nullable
+    @Override
+    public ModContentRegistry getModContainerRegistry() {
+        return ModContainers.getInstance();
     }
 
     @Override

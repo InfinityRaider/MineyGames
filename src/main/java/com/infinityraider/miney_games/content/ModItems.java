@@ -6,7 +6,7 @@ import com.infinityraider.miney_games.content.chess.ItemChessTable;
 import com.infinityraider.miney_games.content.poker.ItemPokerTable;
 import com.infinityraider.miney_games.content.pool.ItemPoolTable;
 
-public class ModItems extends ModContentRegistry {
+public final class ModItems extends ModContentRegistry {
     private static final ModItems INSTANCE = new ModItems();
 
     public static ModItems getInstance() {
