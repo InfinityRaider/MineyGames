@@ -4,6 +4,7 @@ import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.core.GameWrapper;
 import com.infinityraider.miney_games.games.chess.*;
 import com.infinityraider.miney_games.network.chess.MessageSelectSquare;
+import com.infinityraider.miney_games.network.chess.MessageSetChessPlayer;
 import com.infinityraider.miney_games.network.chess.MessageSyncChessMove;
 import com.infinityraider.miney_games.reference.Names;
 import net.minecraft.Util;
@@ -34,8 +35,8 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         this.table = table;
         this.settings = new Settings(); // TODO: differentiate between client and server clock
         this.game = new ChessGame(this.getSettings());
-        this.player1 = new Participant(this);
-        this.player2 = new Participant(this);
+        this.player1 = new Participant(this, true);
+        this.player2 = new Participant(this, false);
     }
 
     public TileChessTable getTable() {
@@ -271,6 +272,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
 
     public static class Participant {
         private final ChessGameWrapper game;
+        private final boolean p1;
 
         private UUID id;
         private ChessColour colour;
@@ -278,12 +280,21 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
 
         private ChessBoard.Square selected;
 
-        public Participant(ChessGameWrapper game) {
+        public Participant(ChessGameWrapper game, boolean p1) {
             this.game = game;
+            this.p1 = p1;
         }
 
         public ChessGameWrapper getWrapper() {
             return this.game;
+        }
+
+        public boolean isPlayer1() {
+            return this.p1;
+        }
+
+        public boolean isPlayer2() {
+            return !this.p1;
         }
 
         protected Optional<ChessGame> getGame() {
@@ -307,11 +318,34 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         }
 
         public void removePlayer() {
+            if(this.getWrapper().isRunning()) {
+                // can't modify the players while the game is running
+                return;
+            }
             this.id = null;
+            if(this.isServerSide()) {
+                new MessageSetChessPlayer(this.getTable(), this.isPlayer1()).sendToAll();
+            }
         }
 
-        public void setPlayer(Player player) {
-            this.id = player.getUUID();
+        public void setPlayer(UUID id) {
+            if(id.equals(Util.NIL_UUID)) {
+                this.removePlayer();
+            } else {
+                if(this.getWrapper().isRunning()) {
+                    // can't modify the players while the game is running
+                    return;
+                }
+                this.id = id;
+                if(this.isServerSide()) {
+                    new MessageSetChessPlayer(this.getTable(), this.isPlayer1(), id).sendToAll();
+                }
+            }
+
+        }
+
+        protected void setPlayer(Player player) {
+            this.setPlayer(player.getUUID());
         }
 
         public boolean hasPlayer() {
@@ -380,6 +414,14 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                 return this.getWrapper().makeMoveServer(this.selected, to);
             }
             return false;
+        }
+
+        public boolean isClientSide() {
+            return this.getTable().isRemote();
+        }
+
+        public boolean isServerSide() {
+            return !this.isClientSide();
         }
 
         public Optional<Vec3i> getHighLightColour(int relX, int relY, boolean hovered) {
