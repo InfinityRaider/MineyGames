@@ -195,10 +195,30 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
 
     @Override
     protected void readFromNBT(CompoundTag tag) {
-        this.getSettings().readFromTag(tag.getCompound(Names.NBT.SETTINGS));
-        this.readChessGame(tag.getCompound(Names.NBT.GAME));
-        this.getPlayer1().readFromNBT(tag.getCompound(Names.NBT.PLAYER_1));
-        this.getPlayer2().readFromNBT(tag.getCompound(Names.NBT.PLAYER_2));
+        // settings
+        if (tag.contains(Names.NBT.SETTINGS)) {
+            this.getSettings().readFromTag(tag.getCompound(Names.NBT.SETTINGS));
+        } else {
+            this.settings.reset();
+        }
+        // chess game
+        if (tag.contains(Names.NBT.GAME)) {
+            this.readChessGame(tag.getCompound(Names.NBT.GAME));
+        } else {
+            this.game = new ChessGame(this.getSettings());
+        }
+        // participant 1
+        if (tag.contains(Names.NBT.PLAYER_1)) {
+            this.getPlayer1().readFromNBT(tag.getCompound(Names.NBT.PLAYER_1));
+        } else {
+            this.getPlayer1().reset();
+        }
+        // participant 2
+        if (tag.contains(Names.NBT.PLAYER_2)) {
+            this.getPlayer2().readFromNBT(tag.getCompound(Names.NBT.PLAYER_2));
+        } else {
+            this.getPlayer2().reset();
+        }
     }
 
     protected CompoundTag writeChessGame() {
@@ -424,6 +444,12 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             }
         }
 
+        protected void reset() {
+            this.id = null;
+            this.score = 0;
+            this.selected = null;
+        }
+
         protected CompoundTag writeToNBT() {
             CompoundTag tag = new CompoundTag();
             tag.putUUID(Names.NBT.PARTICIPANT, this.id == null ? Util.NIL_UUID : this.id);
@@ -467,6 +493,10 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         @Override
         public void pieceSetup(ChessGame game, ChessBoard.Square square) {
             DEFAULT.pieceSetup(game, square);
+        }
+
+        protected void reset() {
+            // TODO
         }
 
         public CompoundTag writeToTag() {
