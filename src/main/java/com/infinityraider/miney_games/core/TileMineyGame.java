@@ -41,6 +41,10 @@ public abstract class TileMineyGame<B extends BlockMineyGame<?>, W extends GameW
         return (B) this.getBlockState().getBlock();
     }
 
+    public boolean isMainTile() {
+        return this.getAbsX() == 0 && this.getAbsY() == 0;
+    }
+
     public boolean isFunctional() {
         return this.getBlock().isFunctional(this.getBlockState());
     }

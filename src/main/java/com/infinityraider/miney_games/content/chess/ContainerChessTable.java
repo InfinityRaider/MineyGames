@@ -13,17 +13,17 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ContainerChessTable extends ContainerMenuBase {
-    private static final int OFFSET_X = 0;
-    private static final int OFFSET_Y = 0;
-
     private final ChessGameWrapper game;
 
-    public ContainerChessTable(int id, Inventory inventory, BlockPos pos) {
-        super(ModContainers.getInstance().CHESS_TABLE_MENU_TYPE.get(), id, inventory, OFFSET_X, OFFSET_Y);
-        BlockEntity tile = inventory.player.getLevel().getBlockEntity(pos);
+    protected ContainerChessTable(int id, Inventory inventory, @Nullable BlockEntity tile) {
+        super(ModContainers.getInstance().CHESS_TABLE_MENU_TYPE.get(), id, inventory, 8, 84);
         this.game = tile instanceof TileChessTable
                 ? ((TileChessTable) tile).getWrapper()
                 : null;
+    }
+
+    public ContainerChessTable(int id, Inventory inventory, BlockPos pos) {
+        this(id, inventory, inventory.player.getLevel().getBlockEntity(pos));
     }
 
     public boolean isValid() {

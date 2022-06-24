@@ -12,12 +12,14 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.NetworkHooks;
 
 import java.util.*;
 import java.util.List;
@@ -72,9 +74,9 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return InteractionResult.PASS;
         }
         if(player.isDiscrete()) {
-            // TODO: open the GUI, currently just toggle the players for testing
-            togglePlayerDebug(this.getPlayer1(), player);
-            togglePlayerDebug(this.getPlayer2(), player);
+            if(player instanceof ServerPlayer) {
+                NetworkHooks.openGui((ServerPlayer) player, this.getTable(), this.getTable().getBlockPos());
+            }
         } else {
             this.asParticipant(player).ifPresent(participant -> this.getGame()
                     .map(ChessGame::getCurrentParticipant)

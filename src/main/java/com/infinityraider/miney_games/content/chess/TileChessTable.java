@@ -2,11 +2,17 @@ package com.infinityraider.miney_games.content.chess;
 
 import com.infinityraider.infinitylib.block.tile.InfinityTileEntityType;
 import com.infinityraider.infinitylib.utility.RayTraceHelper;
+import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.client.render.ChessTableRenderer;
 import com.infinityraider.miney_games.content.ModTiles;
 import com.infinityraider.miney_games.core.TileMineyGame;
+import com.infinityraider.miney_games.reference.Names;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
@@ -20,8 +26,9 @@ import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class TileChessTable extends TileMineyGame<BlockChessTable, ChessGameWrapper> {
-    private static final double RAY_TRACE_RANGE = 7.0;
+public class TileChessTable extends TileMineyGame<BlockChessTable, ChessGameWrapper> implements MenuProvider {
+    public static final TranslatableComponent NAME = new TranslatableComponent(MineyGames.instance.getModId() + ".gui." + Names.CHESS_TABLE);
+    public static final double RAY_TRACE_RANGE = 7.0;
 
     private final ChessGameWrapper game;
 
@@ -33,6 +40,9 @@ public class TileChessTable extends TileMineyGame<BlockChessTable, ChessGameWrap
     @Override
     public ChessGameWrapper getWrapper() {
         if(this.getLevel() == null) {
+            return this.game;
+        }
+        if(this.isMainTile()) {
             return this.game;
         }
         return this.getBlock().getMainTile(this.getLevel(), this.getBlockPos(), this.getBlockState())
@@ -84,6 +94,17 @@ public class TileChessTable extends TileMineyGame<BlockChessTable, ChessGameWrap
 
     public static RenderFactory createRenderFactory() {
         return new RenderFactory();
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return NAME;
+    }
+
+    @Nullable
+    @Override
+    public ContainerChessTable createMenu(int id, Inventory inv, Player player) {
+        return new ContainerChessTable(id, inv, this);
     }
 
     private static class RenderFactory implements InfinityTileEntityType.IRenderFactory<TileChessTable> {
