@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -273,6 +274,8 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
     }
 
     public static class Participant {
+        private static final int WAGER_COUNT = 9;
+
         private final ChessGameWrapper game;
         private final boolean p1;
 
@@ -282,9 +285,15 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
 
         private ChessBoard.Square selected;
 
+        private final ItemStack[] wagers;
+
         public Participant(ChessGameWrapper game, boolean p1) {
             this.game = game;
             this.p1 = p1;
+            this.wagers = new ItemStack[WAGER_COUNT];
+            for(int i = 0; i < WAGER_COUNT; i++) {
+                wagers[i] = ItemStack.EMPTY;
+            }
         }
 
         public ChessGameWrapper getWrapper() {
@@ -501,15 +510,24 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             tag.putInt(Names.NBT.SCORE, this.score);
             tag.putInt(Names.NBT.X, this.selected == null ? -1 : this.selected.getX());
             tag.putInt(Names.NBT.Y, this.selected == null ? -1 : this.selected.getY());
+            ListTag wagers = new ListTag();
+            for(int i = 0; i < WAGER_COUNT; i++) {
+                wagers.add(this.wagers[i].save(new CompoundTag()));
+            }
+            tag.put(Names.NBT.WAGERS, wagers);
             return tag;
         }
 
         protected void readFromNBT(CompoundTag tag) {
-            UUID id = tag.getUUID(Names.NBT.PARTICIPANT);
+            UUID id = tag.contains(Names.NBT.PARTICIPANT) ? tag.getUUID(Names.NBT.PARTICIPANT) : Util.NIL_UUID;
             this.id = id.equals(Util.NIL_UUID) ? null : id;
             this.colour = ChessColour.fromName(tag.getString(Names.NBT.COLOUR));
             this.score = tag.getInt(Names.NBT.SCORE);
             this.selected = this.getWrapper().getSquare(tag.getInt(Names.NBT.X), tag.getInt(Names.NBT.Y)).orElse(null);
+            ListTag wagers = tag.contains(Names.NBT.WAGERS) ? tag.getList(Names.NBT.WAGERS, Tag.TAG_COMPOUND) : new ListTag();
+            for(int i = 0; i < WAGER_COUNT; i++) {
+                this.wagers[i] = wagers.size() > i ? ItemStack.of(wagers.getCompound(i)) : ItemStack.EMPTY;
+            }
         }
     }
 

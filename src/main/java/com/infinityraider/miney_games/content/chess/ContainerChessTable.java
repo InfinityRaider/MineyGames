@@ -16,7 +16,7 @@ public class ContainerChessTable extends ContainerMenuBase {
     private final ChessGameWrapper game;
 
     protected ContainerChessTable(int id, Inventory inventory, @Nullable BlockEntity tile) {
-        super(ModContainers.getInstance().CHESS_TABLE_MENU_TYPE.get(), id, inventory, 8, 84);
+        super(ModContainers.getInstance().CHESS_TABLE_MENU_TYPE.get(), id, inventory, 8, 149);
         this.game = tile instanceof TileChessTable
                 ? ((TileChessTable) tile).getWrapper()
                 : null;

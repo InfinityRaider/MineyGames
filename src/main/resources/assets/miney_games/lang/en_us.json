@@ -6,5 +6,9 @@
   "item.miney_games.poker_table": "Poker Table",
 
   "block.miney_games.pool_table": "Pool Table",
-  "item.miney_games.pool_table": "Pool Table"
+  "item.miney_games.pool_table": "Pool Table",
+
+
+  "miney_games.gui.button.wager": "Wager",
+  "miney_games.gui.button.propose": "Propose"
 }
