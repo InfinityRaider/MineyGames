@@ -1,10 +1,12 @@
 package com.infinityraider.miney_games.content.chess;
 
-import com.infinityraider.infinitylib.container.ContainerMenuBase;
 import com.infinityraider.miney_games.content.ModContainers;
+import com.infinityraider.miney_games.core.ContainerMineyGame;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import javax.annotation.Nullable;
@@ -12,7 +14,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ContainerChessTable extends ContainerMenuBase {
+public class ContainerChessTable extends ContainerMineyGame {
     private final ChessGameWrapper game;
 
     protected ContainerChessTable(int id, Inventory inventory, @Nullable BlockEntity tile) {
@@ -34,4 +36,12 @@ public class ContainerChessTable extends ContainerMenuBase {
     public ChessGameWrapper getGame() {
         return this.game;
     }
+
+    public static class WagerSlot extends Slot {
+        public WagerSlot(Container pContainer, int pIndex, int pX, int pY) {
+            super(pContainer, pIndex, pX, pY);
+        }
+    }
+
+
 }

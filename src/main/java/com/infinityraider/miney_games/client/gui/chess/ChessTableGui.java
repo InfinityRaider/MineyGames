@@ -66,6 +66,7 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable> {
         this.addRenderableWidget(this.proposeWagerButton.relative(this).disable().hide());
         this.addRenderableWidget(this.acceptWagerButton.relative(this)).disable().hide();
         this.addRenderableWidget(this.declineWagerButton.relative(this).disable()).hide();
+        this.disablePlayerInventorySlots();
     }
 
     @Override
@@ -84,16 +85,27 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable> {
         }
     }
 
+    @Override
+    protected void renderLabels(PoseStack transforms, int mouseX, int mouseY) {
+        if(this.wagering) {
+            super.renderLabels(transforms, mouseX, mouseY);
+        } else {
+            this.font.draw(transforms, this.title, (float) this.titleLabelX, (float) this.titleLabelY, 4210752);
+        }
+    }
+
     protected void onShowWagerButtonPress() {
         this.wagering = !this.wagering;
         if(this.wagering) {
             this.proposeWagerButton.enable().unhide();
             this.acceptWagerButton.enable().unhide();
             this.declineWagerButton.enable().unhide();
+            this.enablePlayerInventorySlots();
         } else {
             this.proposeWagerButton.disable().hide();
             this.acceptWagerButton.disable().hide();
             this.declineWagerButton.disable().hide();
+            this.disablePlayerInventorySlots();
         }
     }
 
