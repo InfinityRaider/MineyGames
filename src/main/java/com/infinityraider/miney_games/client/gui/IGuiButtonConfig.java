@@ -26,5 +26,12 @@ public interface IGuiButtonConfig {
 
         int v2();
 
+        default int edgeWidth() {
+            return 1;
+        }
+
+        default int edgeHeight() {
+            return 1;
+        }
     }
 }

@@ -2,7 +2,7 @@ package com.infinityraider.miney_games.proxy;
 
 import com.infinityraider.infinitylib.container.IInfinityContainerMenuType;
 import com.infinityraider.infinitylib.proxy.base.IClientProxyBase;
-import com.infinityraider.miney_games.client.gui.ChessTableGui;
+import com.infinityraider.miney_games.client.gui.chess.ChessTableGui;
 import com.infinityraider.miney_games.config.Config;
 import com.infinityraider.miney_games.content.chess.ContainerChessTable;
 import net.minecraft.client.gui.screens.MenuScreens;

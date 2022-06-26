@@ -9,6 +9,7 @@
   "item.miney_games.pool_table": "Pool Table",
 
 
+  "miney_games.gui.chess_table": "Chess",
   "miney_games.gui.button.wager": "Wager",
   "miney_games.gui.button.propose": "Propose"
 }

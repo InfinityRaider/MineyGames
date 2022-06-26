@@ -1,6 +1,9 @@
-package com.infinityraider.miney_games.client.gui;
+package com.infinityraider.miney_games.client.gui.chess;
 
 import com.infinityraider.miney_games.MineyGames;
+import com.infinityraider.miney_games.client.gui.GuiMineyGame;
+import com.infinityraider.miney_games.client.gui.GuiButtonMineyGame;
+import com.infinityraider.miney_games.client.gui.IGuiButtonConfig;
 import com.infinityraider.miney_games.content.chess.ContainerChessTable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -22,6 +25,7 @@ import java.util.Optional;
 public class ChessTableGui extends GuiMineyGame<ContainerChessTable> {
     public static final MenuScreens.ScreenConstructor<ContainerChessTable, ChessTableGui> PROVIDER = ChessTableGui::new;
     public static final ResourceLocation TEXTURE = new ResourceLocation(MineyGames.instance.getModId(), "textures/gui/chess/gui.png");
+    public static final int Y_SPLIT = 72;
 
     public static final IGuiButtonConfig BUTTON_CONFIG_TEXT = new ButtonConfig();
     public static final IGuiButtonConfig BUTTON_CONFIG_ACCEPT = new ButtonConfig(48);
@@ -34,30 +38,34 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable> {
         return PROVIDER;
     }
 
-    private final GuiMineyGameButton showWagerButton;
-    private final GuiMineyGameButton proposeWagerButton;
-    private final GuiMineyGameButton acceptWagerButton;
-    private final GuiMineyGameButton declineWagerButton;
+    private final GuiButtonMineyGame showWagerButton;
+    private final GuiButtonMineyGame proposeWagerButton;
+    private final GuiButtonMineyGame acceptWagerButton;
+    private final GuiButtonMineyGame declineWagerButton;
+
+    private boolean wagering;
 
     public ChessTableGui(ContainerChessTable menu, Inventory inv, Component title) {
         super(menu, inv, title);
         // set image dimensions
-        this.imageWidth = 256;
-        this.imageHeight = 256;
-        this.inventoryLabelY = this.imageHeight - 119;
+        this.imageWidth = 176;
+        this.imageHeight = 231;
+        this.inventoryLabelY = this.imageHeight - 94;
         // init buttons
-        this.showWagerButton = new GuiMineyGameButton(7, 59, 48, 12, BUTTON_CONFIG_TEXT, WAGER_TEXT, this::onShowWagerButtonPress);
-        this.proposeWagerButton = new GuiMineyGameButton(7, 121, 48, 12, BUTTON_CONFIG_TEXT, PROPOSE_TEXT, this::onProposeButtonPress);
-        this.acceptWagerButton = new GuiMineyGameButton(143, 121, 12, 12, BUTTON_CONFIG_ACCEPT, this::onAcceptWagerButtonPress);
-        this.declineWagerButton = new GuiMineyGameButton(157, 121, 12, 12, BUTTON_CONFIG_DECLINE, this::onDeclineWagerButtonPress);
+        this.showWagerButton = new GuiButtonMineyGame(7, 59, 48, 12, BUTTON_CONFIG_TEXT, WAGER_TEXT, this::onShowWagerButtonPress);
+        this.proposeWagerButton = new GuiButtonMineyGame(7, 121, 48, 12, BUTTON_CONFIG_TEXT, PROPOSE_TEXT, this::onProposeButtonPress);
+        this.acceptWagerButton = new GuiButtonMineyGame(143, 121, 12, 12, BUTTON_CONFIG_ACCEPT, this::onAcceptWagerButtonPress);
+        this.declineWagerButton = new GuiButtonMineyGame(157, 121, 12, 12, BUTTON_CONFIG_DECLINE, this::onDeclineWagerButtonPress);
+        // status variables
+        this.wagering = false;
     }
 
     protected void init() {
         super.init();
-        this.addRenderableWidget(this.showWagerButton);
-        this.addRenderableWidget(this.proposeWagerButton);
-        this.addRenderableWidget(this.acceptWagerButton);
-        this.addRenderableWidget(this.declineWagerButton);
+        this.addRenderableWidget(this.showWagerButton.relative(this));
+        this.addRenderableWidget(this.proposeWagerButton.relative(this).disable().hide());
+        this.addRenderableWidget(this.acceptWagerButton.relative(this)).disable().hide();
+        this.addRenderableWidget(this.declineWagerButton.relative(this).disable()).hide();
     }
 
     @Override
@@ -66,12 +74,27 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable> {
         RenderSystem.setShaderTexture(0, TEXTURE);
         int relX = (this.width - this.imageWidth) / 2;
         int relY = (this.height - this.imageHeight) / 2;
-        // background
-        this.blit(transforms, relX, relY, 0, 0, this.imageWidth, this.imageHeight);
+        if(this.wagering) {
+            // full texture
+            this.blit(transforms, relX, relY, 0, 0, this.imageWidth, this.imageHeight);
+        } else {
+            // exclude wagering
+            this.blit(transforms, relX, relY, 0, 0, this.imageWidth, Y_SPLIT);
+            this.blit(transforms, relX, relY + Y_SPLIT, 0, 225, this.imageWidth, 6);
+        }
     }
 
     protected void onShowWagerButtonPress() {
-
+        this.wagering = !this.wagering;
+        if(this.wagering) {
+            this.proposeWagerButton.enable().unhide();
+            this.acceptWagerButton.enable().unhide();
+            this.declineWagerButton.enable().unhide();
+        } else {
+            this.proposeWagerButton.disable().hide();
+            this.acceptWagerButton.disable().hide();
+            this.declineWagerButton.disable().hide();
+        }
     }
 
     protected void onProposeButtonPress() {
@@ -145,7 +168,7 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable> {
 
             @Override
             default int v2() {
-                return 244;
+                return 256;
             }
         }
     }
