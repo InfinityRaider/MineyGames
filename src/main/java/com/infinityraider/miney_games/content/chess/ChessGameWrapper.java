@@ -2,8 +2,10 @@ package com.infinityraider.miney_games.content.chess;
 
 import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.core.GameWrapper;
+import com.infinityraider.miney_games.core.PlayerState;
 import com.infinityraider.miney_games.core.Wager;
 import com.infinityraider.miney_games.games.chess.*;
+import com.infinityraider.miney_games.network.chess.MessageReadyChessPlayer;
 import com.infinityraider.miney_games.network.chess.MessageSelectSquare;
 import com.infinityraider.miney_games.network.chess.MessageSetChessPlayer;
 import com.infinityraider.miney_games.network.chess.MessageSyncChessMove;
@@ -279,6 +281,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         private final Wager<ChessGameWrapper> wagers;
 
         private UUID id;
+        private PlayerState state;
         private ChessColour colour;
         private int score;
 
@@ -288,6 +291,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             this.game = game;
             this.p1 = p1;
             this.wagers = new Wager<>(game);
+            this.state = PlayerState.EMPTY;
         }
 
         public ChessGameWrapper getWrapper() {
@@ -326,6 +330,10 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return this.getWrapper().getTable();
         }
 
+        public PlayerState getState() {
+            return this.state;
+        }
+
         public void removePlayer() {
             if(this.getWrapper().isRunning()) {
                 // can't modify the players while the game is running
@@ -333,8 +341,14 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             }
             this.id = null;
             this.wagers.leave();
+            this.state = PlayerState.EMPTY;
+            if(this.isPlayer1()) {
+                this.getWrapper().getPlayer2().onOtherPlayerLeft();
+            } else {
+                this.getWrapper().getPlayer1().onOtherPlayerLeft();
+            }
             if(this.isServerSide()) {
-                new MessageSetChessPlayer(this.getTable(), this.isPlayer1()).sendToAll();
+                new MessageSetChessPlayer.ToClient(this.getTable(), this.isPlayer1()).sendToAll();
             }
         }
 
@@ -348,11 +362,16 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                 }
                 this.id = id;
                 this.wagers.join(id);
+                this.state = PlayerState.PREPARING;
+                if(this.isPlayer1()) {
+                    this.getWrapper().getPlayer2().onOtherPlayerJoined();
+                } else {
+                    this.getWrapper().getPlayer1().onOtherPlayerJoined();
+                }
                 if(this.isServerSide()) {
-                    new MessageSetChessPlayer(this.getTable(), this.isPlayer1(), id).sendToAll();
+                    new MessageSetChessPlayer.ToClient(this.getTable(), this.isPlayer1(), id).sendToAll();
                 }
             }
-
         }
 
         protected void setPlayer(Player player) {
@@ -365,6 +384,46 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
 
         public boolean isPlayer(Player player) {
             return this.hasPlayer() && this.id.equals(player.getUUID());
+        }
+
+        public UUID getPlayerId() {
+            return this.id == null ? Util.NIL_UUID : this.id;
+        }
+
+        protected void onOtherPlayerJoined() {
+            if(this.hasPlayer()) {
+                this.state = PlayerState.PREPARING;
+            }
+        }
+
+        protected void onOtherPlayerLeft() {
+            if(this.hasPlayer()) {
+                this.state = PlayerState.PREPARING;
+            }
+        }
+
+        public void setReadiness(boolean ready) {
+            if(!this.hasPlayer()) {
+                return;
+            }
+            if(ready) {
+                if(this.state.isPreparing()) {
+                    this.state = PlayerState.READY;
+                    ready = true;
+                } else {
+                    ready = false;
+                }
+            } else {
+                if(this.state.isReady()) {
+                    this.state = PlayerState.PREPARING;
+                    ready = false;
+                } else {
+                    ready = true;
+                }
+            }
+            if(this.isServerSide()) {
+                new MessageReadyChessPlayer.ToClient(this.getTable(), this.isPlayer1(), ready).sendToAll();
+            }
         }
 
         protected ChessColour getColour() {
@@ -501,6 +560,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             this.id = null;
             this.score = 0;
             this.selected = null;
+            this.state = PlayerState.EMPTY;
             this.getWagers().reset();
         }
 
@@ -511,6 +571,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             tag.putInt(Names.NBT.SCORE, this.score);
             tag.putInt(Names.NBT.X, this.selected == null ? -1 : this.selected.getX());
             tag.putInt(Names.NBT.Y, this.selected == null ? -1 : this.selected.getY());
+            this.getState().toTag(tag);
             tag.put(Names.NBT.WAGERS, this.getWagers().writeToNBT());
             return tag;
         }
@@ -521,6 +582,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             this.colour = ChessColour.fromName(tag.getString(Names.NBT.COLOUR));
             this.score = tag.getInt(Names.NBT.SCORE);
             this.selected = this.getWrapper().getSquare(tag.getInt(Names.NBT.X), tag.getInt(Names.NBT.Y)).orElse(null);
+            this.state = PlayerState.fromTag(tag);
             if(tag.contains(Names.NBT.WAGERS, Tag.TAG_COMPOUND)) {
                 this.getWagers().readFromNBT(tag.getCompound(Names.NBT.WAGERS));
             } else {

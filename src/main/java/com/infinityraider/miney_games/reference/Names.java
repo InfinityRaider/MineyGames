@@ -15,6 +15,7 @@ public class Names {
         public static final String PLAYER_2 = "mg_p2";
         public static final String SCORE = "mg_score";
         public static final String SETTINGS = "mg_sts";
+        public static final String STATE = "mg_stt";
         public static final String WAGERS = "mg_wgs";
         public static final String X = "mg_x";
         public static final String Y = "mg_y";

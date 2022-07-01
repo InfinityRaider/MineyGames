@@ -9,4 +9,6 @@ public interface IProxy extends IProxyBase<Config> {
     default IInfinityContainerMenuType.IGuiFactory<ContainerChessTable> chessGuiFactory() {
         return null;
     }
+
+    default void updateMineyGameGui() {}
 }

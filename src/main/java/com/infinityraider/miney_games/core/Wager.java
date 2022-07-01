@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.UUID;
 
 public class Wager<W extends GameWrapper<?>> {
-    private static final int MAX_STACKS = 9;
+    private static final int MAX_STACKS = 7;
 
     private final W game;
     private final ItemStack[] wagers;

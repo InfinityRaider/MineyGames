@@ -2,10 +2,13 @@ package com.infinityraider.miney_games.proxy;
 
 import com.infinityraider.infinitylib.container.IInfinityContainerMenuType;
 import com.infinityraider.infinitylib.proxy.base.IClientProxyBase;
+import com.infinityraider.miney_games.client.gui.GuiMineyGame;
 import com.infinityraider.miney_games.client.gui.chess.ChessTableGui;
 import com.infinityraider.miney_games.config.Config;
 import com.infinityraider.miney_games.content.chess.ContainerChessTable;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.function.Function;
@@ -40,5 +43,13 @@ public class ClientProxy implements IProxy, IClientProxyBase<Config> {
                 return ChessTableGui.getProvider();
             }
         };
+    }
+
+    @Override
+    public void updateMineyGameGui() {
+        Screen screen = Minecraft.getInstance().screen;
+        if(screen instanceof GuiMineyGame) {
+            ((GuiMineyGame<?,?,?>) screen).updateGuiState();
+        }
     }
 }

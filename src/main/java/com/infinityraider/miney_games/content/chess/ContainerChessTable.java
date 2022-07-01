@@ -14,27 +14,16 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ContainerChessTable extends ContainerMineyGame {
-    private final ChessGameWrapper game;
-
+public class ContainerChessTable extends ContainerMineyGame<TileChessTable, ChessGameWrapper> {
     protected ContainerChessTable(int id, Inventory inventory, @Nullable BlockEntity tile) {
-        super(ModContainers.getInstance().CHESS_TABLE_MENU_TYPE.get(), id, inventory, 8, 149);
-        this.game = tile instanceof TileChessTable
-                ? ((TileChessTable) tile).getWrapper()
-                : null;
+        super(ModContainers.getInstance().CHESS_TABLE_MENU_TYPE.get(),
+                id,
+                tile instanceof TileChessTable ? (TileChessTable) tile : null,
+                inventory, 8, 161);
     }
 
     public ContainerChessTable(int id, Inventory inventory, BlockPos pos) {
         this(id, inventory, inventory.player.getLevel().getBlockEntity(pos));
-    }
-
-    public boolean isValid() {
-        return this.getGame() != null;
-    }
-
-    @Nullable
-    public ChessGameWrapper getGame() {
-        return this.game;
     }
 
     public static class WagerSlot extends Slot {

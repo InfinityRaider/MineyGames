@@ -64,7 +64,10 @@ public class MineyGames extends InfinityMod<IProxy, Config> {
     @Override
     public void registerMessages(INetworkWrapper wrapper) {
         wrapper.registerMessage(MessageSelectSquare.class);
-        wrapper.registerMessage(MessageSetChessPlayer.class);
+        wrapper.registerMessage(MessageReadyChessPlayer.ToClient.class);
+        wrapper.registerMessage(MessageReadyChessPlayer.ToServer.class);
+        wrapper.registerMessage(MessageSetChessPlayer.ToClient.class);
+        wrapper.registerMessage(MessageSetChessPlayer.ToServer.class);
         wrapper.registerMessage(MessageSyncChessMove.class);
     }
 }
