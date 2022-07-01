@@ -20,6 +20,7 @@ public class MessageSyncChessMove extends MessageChessGameBase {
         this();
         this.table = tile;
         this.move = new MessageChessGameBase.SyncMove(move);
+        this.sendToAll();
     }
 
     public Optional<ChessMove> getMove(ChessGame game) {

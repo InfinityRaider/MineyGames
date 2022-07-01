@@ -6,7 +6,8 @@ public enum ChessGameStatus {
     MATE(true, false),
     TIME_OUT(true, false),
     STALEMATE(true, true),
-    DRAW(true, true);
+    DRAW(true, true),
+    RESIGNED(true, false);
 
     final boolean finished;
     final boolean draw;

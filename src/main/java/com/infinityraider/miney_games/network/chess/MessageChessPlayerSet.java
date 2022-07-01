@@ -9,20 +9,20 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.UUID;
 
-public abstract class MessageSetChessPlayer extends MessageBase {
+public abstract class MessageChessPlayerSet extends MessageBase {
     private TileChessTable table;
     private boolean p1;
     private UUID id;
 
-    public MessageSetChessPlayer() {
+    public MessageChessPlayerSet() {
         super();
     }
 
-    public MessageSetChessPlayer(TileChessTable table, boolean p1) {
+    private MessageChessPlayerSet(TileChessTable table, boolean p1) {
         this(table, p1, Util.NIL_UUID);
     }
 
-    public MessageSetChessPlayer(TileChessTable table, boolean p1, UUID id) {
+    private MessageChessPlayerSet(TileChessTable table, boolean p1, UUID id) {
         this();
         this.table = table;
         this.p1 = p1;
@@ -37,10 +37,11 @@ public abstract class MessageSetChessPlayer extends MessageBase {
             } else {
                 this.table.getWrapper().getPlayer2().setPlayer(this.id);
             }
+            MineyGames.instance.proxy().updateMineyGameGui();
         }
     }
 
-    public static class ToClient extends MessageSetChessPlayer {
+    public static class ToClient extends MessageChessPlayerSet {
         @SuppressWarnings("unused")
         public ToClient() {
             super();
@@ -48,25 +49,21 @@ public abstract class MessageSetChessPlayer extends MessageBase {
 
         public ToClient(TileChessTable table, boolean p1) {
             super(table, p1);
+            this.sendToAll();
         }
 
         public ToClient(TileChessTable table, boolean p1, UUID id) {
             super(table, p1, id);
+            this.sendToAll();
         }
 
         @Override
         public NetworkDirection getMessageDirection() {
             return NetworkDirection.PLAY_TO_CLIENT;
         }
-
-        @Override
-        protected void processMessage(NetworkEvent.Context ctx) {
-            super.processMessage(ctx);
-            MineyGames.instance.proxy().updateMineyGameGui();
-        }
     }
 
-    public static class ToServer extends MessageSetChessPlayer {
+    public static class ToServer extends MessageChessPlayerSet {
         @SuppressWarnings("unused")
         public ToServer() {
             super();
@@ -74,10 +71,12 @@ public abstract class MessageSetChessPlayer extends MessageBase {
 
         public ToServer(TileChessTable table, boolean p1) {
             super(table, p1);
+            this.sendToServer();
         }
 
         public ToServer(TileChessTable table, boolean p1, UUID id) {
             super(table, p1, id);
+            this.sendToServer();
         }
 
         @Override

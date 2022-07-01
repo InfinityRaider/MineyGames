@@ -44,6 +44,7 @@ public class ChessClock {
         if(this.isTimeUp()) {
             return;
         }
+        this.lastMillis = System.currentTimeMillis();
         this.running = true;
         this.tick();
     }

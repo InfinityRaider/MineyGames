@@ -5,10 +5,7 @@ import com.infinityraider.miney_games.core.GameWrapper;
 import com.infinityraider.miney_games.core.PlayerState;
 import com.infinityraider.miney_games.core.Wager;
 import com.infinityraider.miney_games.games.chess.*;
-import com.infinityraider.miney_games.network.chess.MessageReadyChessPlayer;
-import com.infinityraider.miney_games.network.chess.MessageSelectSquare;
-import com.infinityraider.miney_games.network.chess.MessageSetChessPlayer;
-import com.infinityraider.miney_games.network.chess.MessageSyncChessMove;
+import com.infinityraider.miney_games.network.chess.*;
 import com.infinityraider.miney_games.reference.Names;
 import net.minecraft.Util;
 import net.minecraft.core.Vec3i;
@@ -40,8 +37,8 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         this.table = table;
         this.settings = new Settings(); // TODO: differentiate between client and server clock
         this.game = new ChessGame(this.getSettings());
-        this.player1 = new Participant(this, true);
-        this.player2 = new Participant(this, false);
+        this.player1 = new Participant(this, true).setColour(ChessColour.WHITE);
+        this.player2 = new Participant(this, false).setColour(ChessColour.BLACK);
     }
 
     public TileChessTable getTable() {
@@ -103,6 +100,20 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         }
     }
 
+    public void startGame() {
+        if(this.isRunning()) {
+            return;
+        }
+        if(this.getPlayer1().hasPlayer() && this.getPlayer1().getState().isReady() && this.getPlayer2().hasPlayer() && this.getPlayer2().getState().isReady()) {
+            this.game.start();
+            this.getPlayer1().onGameStarted();
+            this.getPlayer2().onGameStarted();
+            if(this.isServerSide()) {
+                new MessageChessGameStart.ToClient(this.getTable());
+            }
+        }
+    }
+
     public boolean isRunning() {
         return this.getGame().map(ChessGame::getStatus)
                 .map(ChessGameStatus::isGoing)
@@ -158,7 +169,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                 .map(move -> {
                     boolean moved = this.makeMove(move);
                     if(moved) {
-                        new MessageSyncChessMove(this.getTable(), move).sendToAll();
+                        new MessageSyncChessMove(this.getTable(), move);
                     }
                     return moved;
                 })
@@ -181,6 +192,25 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         }).orElse(false);
     }
 
+    public void resign(boolean p1) {
+        if(this.isRunning()) {
+            this.getGame().ifPresent(game -> {
+                if(p1) {
+                    game.getParticipant(this.getPlayer1().getColour()).resign();
+                    this.getPlayer1().onLose();
+                    this.getPlayer2().onWin();
+                } else {
+                    game.getParticipant(this.getPlayer2().getColour()).resign();
+                    this.getPlayer1().onWin();
+                    this.getPlayer2().onLose();
+                }
+                if(this.isServerSide()) {
+                    new MessageChessPlayerResign.ToClient(this.getTable(), p1);
+                }
+            });
+        }
+    }
+
     public void onSyncMessage(MessageSyncChessMove msg) {
         boolean moved = this.getGame()
                 .flatMap(msg::getMove)
@@ -189,6 +219,14 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         if(!moved) {
             MineyGames.instance.getLogger().error("DETECTED DE-SYNC WITH SERVER IN CHESS GAME");
         }
+    }
+
+    public boolean isClientSide() {
+        return this.getTable().isRemote();
+    }
+
+    public boolean isServerSide() {
+        return !this.isClientSide();
     }
 
     @Override
@@ -298,6 +336,11 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             return this.game;
         }
 
+        private Participant setColour(ChessColour colour) {
+            this.colour = colour;
+            return this;
+        }
+
         public boolean isPlayer1() {
             return this.p1;
         }
@@ -348,7 +391,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                 this.getWrapper().getPlayer1().onOtherPlayerLeft();
             }
             if(this.isServerSide()) {
-                new MessageSetChessPlayer.ToClient(this.getTable(), this.isPlayer1()).sendToAll();
+                new MessageChessPlayerSet.ToClient(this.getTable(), this.isPlayer1());
             }
         }
 
@@ -369,7 +412,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                     this.getWrapper().getPlayer1().onOtherPlayerJoined();
                 }
                 if(this.isServerSide()) {
-                    new MessageSetChessPlayer.ToClient(this.getTable(), this.isPlayer1(), id).sendToAll();
+                    new MessageChessPlayerSet.ToClient(this.getTable(), this.isPlayer1(), id);
                 }
             }
         }
@@ -402,6 +445,25 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
             }
         }
 
+        protected void onGameStarted() {
+            if(this.hasPlayer()) {
+                this.state = PlayerState.PLAYING;
+            }
+        }
+
+        protected void onWin() {
+            // TODO
+
+        }
+
+        protected void onLose() {
+            // TODO
+        }
+
+        protected void onDraw() {
+            // TODO
+        }
+
         public void setReadiness(boolean ready) {
             if(!this.hasPlayer()) {
                 return;
@@ -422,7 +484,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                 }
             }
             if(this.isServerSide()) {
-                new MessageReadyChessPlayer.ToClient(this.getTable(), this.isPlayer1(), ready).sendToAll();
+                new MessageChessPlayerReady.ToClient(this.getTable(), this.isPlayer1(), ready);
             }
         }
 

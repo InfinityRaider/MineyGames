@@ -98,6 +98,9 @@ public class ChessGame {
     }
 
     public void makeMove(ChessMove move) {
+        if(!this.getStatus().isGoing()) {
+            return;
+        }
         // execute the move
         move.execute();
         // notify the participant the move has been made
@@ -134,6 +137,10 @@ public class ChessGame {
         }
     }
 
+    private void onResigned() {
+        this.status = ChessGameStatus.RESIGNED;
+    }
+
     public int getCurrentTurn() {
         return this.currentTurn;
     }
@@ -154,6 +161,7 @@ public class ChessGame {
 
         private boolean mated;
         private boolean timeUp;
+        private boolean resigned;
 
         public Participant(ChessGame game, ChessClock clock, ChessColour colour) {
             this.game = game;
@@ -186,6 +194,11 @@ public class ChessGame {
             }
         }
 
+        public void resign() {
+            this.resigned = true;
+            this.getGame().onResigned();
+        }
+
         public ChessGame getGame() {
             return this.game;
         }
@@ -215,6 +228,10 @@ public class ChessGame {
 
         public boolean isTimeUp() {
             return this.timeUp;
+        }
+
+        public boolean hasResigned() {
+            return this.resigned;
         }
 
         protected Participant scanPotentialMoves() {

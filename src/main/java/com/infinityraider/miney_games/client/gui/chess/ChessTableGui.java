@@ -8,8 +8,9 @@ import com.infinityraider.miney_games.content.chess.ChessGameWrapper;
 import com.infinityraider.miney_games.content.chess.ContainerChessTable;
 import com.infinityraider.miney_games.content.chess.TileChessTable;
 import com.infinityraider.miney_games.core.PlayerState;
-import com.infinityraider.miney_games.network.chess.MessageReadyChessPlayer;
-import com.infinityraider.miney_games.network.chess.MessageSetChessPlayer;
+import com.infinityraider.miney_games.network.chess.MessageChessPlayerReady;
+import com.infinityraider.miney_games.network.chess.MessageChessPlayerSet;
+import com.infinityraider.miney_games.network.chess.MessageChessGameStart;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -19,7 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -98,21 +98,19 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
 
     @Override
     public void updateGuiState() {
-        Player player = this.getPlayer();
         ChessGameWrapper game = this.getGame();
         // null check
         if(game == null || !this.isValid()) {
             this.toggleAllButtons(false);
             return;
         }
-        // player 1 join button
+        // update the buttons
         this.updateJoinLeaveButton(this.joinLeaveWhiteButton, this.hasPlayer1(), this.isPlayer1(), game.isRunning());
-        // player 2 join button
         this.updateJoinLeaveButton(this.joinLeaveBlackButton, this.hasPlayer2(), this.isPlayer2(), game.isRunning());
-        // ready button
         this.updateReadyButton();
-        // start button
         this.updateStartButton();
+        this.updateResignButton();
+        this.updateDrawButton();
     }
 
     protected void init() {
@@ -258,10 +256,10 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
         if(this.hasPlayer1()) {
             if(this.isPlayer1() && !this.isGameRunning()) {
                 // remove player
-                new MessageSetChessPlayer.ToServer(this.getTile(), true).sendToServer();
+                new MessageChessPlayerSet.ToServer(this.getTile(), true);
             }
         } else {
-            new MessageSetChessPlayer.ToServer(this.getTile(), true, this.getPlayer().getUUID()).sendToServer();
+            new MessageChessPlayerSet.ToServer(this.getTile(), true, this.getPlayer().getUUID());
         }
     }
 
@@ -269,10 +267,10 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
         if(this.hasPlayer2()) {
             if(this.isPlayer2() && !this.isGameRunning()) {
                 // remove player
-                new MessageSetChessPlayer.ToServer(this.getTile(), false).sendToServer();
+                new MessageChessPlayerSet.ToServer(this.getTile(), false);
             }
         } else {
-            new MessageSetChessPlayer.ToServer(this.getTile(), false, this.getPlayer().getUUID()).sendToServer();
+            new MessageChessPlayerSet.ToServer(this.getTile(), false, this.getPlayer().getUUID());
         }
     }
 
@@ -280,23 +278,25 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
         if(this.isPlayer1()) {
             PlayerState state = this.getPlayer1State();
             if (state.isReady()) {
-                new MessageReadyChessPlayer.ToServer(this.getTile(), true, false).sendToServer();
+                new MessageChessPlayerReady.ToServer(this.getTile(), true, false);
             } else if (state.isPreparing()) {
-                new MessageReadyChessPlayer.ToServer(this.getTile(), true, true).sendToServer();
+                new MessageChessPlayerReady.ToServer(this.getTile(), true, true);
             }
         }
         if(this.isPlayer2()) {
             PlayerState state = this.getPlayer2State();
             if(state.isReady()) {
-                new MessageReadyChessPlayer.ToServer(this.getTile(), false, false).sendToServer();
+                new MessageChessPlayerReady.ToServer(this.getTile(), false, false);
             } else if(state.isPreparing()) {
-                new MessageReadyChessPlayer.ToServer(this.getTile(), false, true).sendToServer();
+                new MessageChessPlayerReady.ToServer(this.getTile(), false, true);
             }
         }
     }
 
     protected void onStartButtonPress() {
-
+        if(this.isPlayer() && this.getPlayer1State().isReady() && this.getPlayer2State().isReady()) {
+            new MessageChessGameStart.ToServer(this.getTile());
+        }
     }
 
     protected void onResignButtonPress() {
@@ -363,6 +363,22 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
             }
         }
         this.startButton.disable();
+    }
+
+    protected void updateResignButton() {
+        if(this.isPlayer() && this.isGameRunning()) {
+            this.resignButton.enable();
+        } else {
+            this.resignButton.disable();
+        }
+    }
+
+    protected void updateDrawButton() {
+        if(this.isPlayer() && this.isGameRunning()) {
+            this.drawButton.enable();
+        } else {
+            this.drawButton.disable();
+        }
     }
 
     private static class ButtonConfig implements IGuiButtonConfig {
