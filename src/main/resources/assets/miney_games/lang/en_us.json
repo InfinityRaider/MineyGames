@@ -16,6 +16,7 @@
   "miney_games.gui.button.start": "Start",
   "miney_games.gui.button.resign": "Resign",
   "miney_games.gui.button.draw": "Draw",
+  "miney_games.gui.button.clock": "Clock",
   "miney_games.gui.button.wager": "Wager",
   "miney_games.gui.button.propose": "Propose"
 }

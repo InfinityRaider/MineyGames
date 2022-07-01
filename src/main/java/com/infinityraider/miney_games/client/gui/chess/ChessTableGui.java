@@ -41,6 +41,10 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
     public static final int Y_SPLIT_1 = 103;
     public static final int Y_SPLIT_2 = 236;
 
+    public static final int EDGE_WIDTH = 4;
+    public static final int CLOCK_WIDTH = 80;
+    public static final int CLOCK_HEIGHT = 92;
+
     public static final IGuiButtonConfig BUTTON_CONFIG_TEXT = new ButtonConfig();
     public static final IGuiButtonConfig BUTTON_CONFIG_ACCEPT = new ButtonConfig(48);
     public static final IGuiButtonConfig BUTTON_CONFIG_DECLINE = new ButtonConfig(60);
@@ -51,6 +55,7 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
     public static final Component START_TEXT = new TranslatableComponent(MineyGames.instance.getModId() + ".gui.button.start");
     public static final Component RESIGN_TEXT = new TranslatableComponent(MineyGames.instance.getModId() + ".gui.button.resign");
     public static final Component DRAW_TEXT = new TranslatableComponent(MineyGames.instance.getModId() + ".gui.button.draw");
+    public static final Component CLOCK_TEXT = new TranslatableComponent(MineyGames.instance.getModId() + ".gui.button.clock");
     public static final Component WAGER_TEXT = new TranslatableComponent(MineyGames.instance.getModId() + ".gui.button.wager");
     public static final Component PROPOSE_TEXT = new TranslatableComponent(MineyGames.instance.getModId() + ".gui.button.propose");
 
@@ -66,11 +71,13 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
     private final GuiButtonMineyGame drawButton;
     private final GuiButtonMineyGame acceptDrawButton;
     private final GuiButtonMineyGame declineDrawButton;
+    private final GuiButtonMineyGame showClockButton;
     private final GuiButtonMineyGame showWagerButton;
     private final GuiButtonMineyGame proposeWagerButton;
     private final GuiButtonMineyGame acceptWagerButton;
     private final GuiButtonMineyGame declineWagerButton;
 
+    private boolean clock;
     private boolean wagering;
 
     public ChessTableGui(ContainerChessTable menu, Inventory inv, Component title) {
@@ -80,15 +87,16 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
         this.imageHeight = 240;
         this.inventoryLabelY = this.imageHeight - 94;
         // init buttons
-        this.joinLeaveWhiteButton = new GuiButtonMineyGame(6, 89, 51, 12, BUTTON_CONFIG_TEXT, JOIN_TEXT, this::onJoinLeaveWhiteButtonPress);
-        this.joinLeaveBlackButton = new GuiButtonMineyGame(119, 89, 51, 12, BUTTON_CONFIG_TEXT, JOIN_TEXT, this::onJoinLeaveBlackButtonPress);
-        this.readyButton = new GuiButtonMineyGame(61, 16, 54, 12, BUTTON_CONFIG_TEXT, READY_TEXT, this::onReadyButtonPress);
-        this.startButton = new GuiButtonMineyGame(61, 32, 54, 12, BUTTON_CONFIG_TEXT, START_TEXT, this::onStartButtonPress);
-        this.resignButton = new GuiButtonMineyGame(61, 48, 54, 12, BUTTON_CONFIG_TEXT, RESIGN_TEXT, this::onResignButtonPress);
-        this.drawButton = new GuiButtonMineyGame(75, 64, 26, 12, BUTTON_CONFIG_TEXT, DRAW_TEXT, this::onDrawButtonPress);
-        this.acceptDrawButton = new GuiButtonMineyGame(61, 64, 12, 12, BUTTON_CONFIG_ACCEPT, this::onAcceptDrawButtonPress);
-        this.declineDrawButton = new GuiButtonMineyGame(103, 64, 12, 12, BUTTON_CONFIG_DECLINE, this::onDeclineDrawButtonPress);
-        this.showWagerButton = new GuiButtonMineyGame(62, 89, 52, 12, BUTTON_CONFIG_TEXT, WAGER_TEXT, this::onShowWagerButtonPress);
+        this.joinLeaveWhiteButton = new GuiButtonMineyGame(6, 90, 51, 12, BUTTON_CONFIG_TEXT, JOIN_TEXT, this::onJoinLeaveWhiteButtonPress);
+        this.joinLeaveBlackButton = new GuiButtonMineyGame(119, 90, 51, 12, BUTTON_CONFIG_TEXT, JOIN_TEXT, this::onJoinLeaveBlackButtonPress);
+        this.readyButton = new GuiButtonMineyGame(61, 15, 54, 12, BUTTON_CONFIG_TEXT, READY_TEXT, this::onReadyButtonPress);
+        this.startButton = new GuiButtonMineyGame(61, 30, 54, 12, BUTTON_CONFIG_TEXT, START_TEXT, this::onStartButtonPress);
+        this.resignButton = new GuiButtonMineyGame(61, 45, 54, 12, BUTTON_CONFIG_TEXT, RESIGN_TEXT, this::onResignButtonPress);
+        this.drawButton = new GuiButtonMineyGame(75, 60, 26, 12, BUTTON_CONFIG_TEXT, DRAW_TEXT, this::onDrawButtonPress);
+        this.acceptDrawButton = new GuiButtonMineyGame(61, 60, 12, 12, BUTTON_CONFIG_ACCEPT, this::onAcceptDrawButtonPress);
+        this.declineDrawButton = new GuiButtonMineyGame(103, 60, 12, 12, BUTTON_CONFIG_DECLINE, this::onDeclineDrawButtonPress);
+        this.showClockButton = new GuiButtonMineyGame(61, 75, 54, 12, BUTTON_CONFIG_TEXT, CLOCK_TEXT, this::onShowClockButtonPress);
+        this.showWagerButton = new GuiButtonMineyGame(61, 90, 54, 12, BUTTON_CONFIG_TEXT, WAGER_TEXT, this::onShowWagerButtonPress);
         this.proposeWagerButton = new GuiButtonMineyGame(95, 144, 46, 12, BUTTON_CONFIG_TEXT, PROPOSE_TEXT, this::onProposeButtonPress);
         this.acceptWagerButton = new GuiButtonMineyGame(143, 144, 12, 12, BUTTON_CONFIG_ACCEPT, this::onAcceptWagerButtonPress);
         this.declineWagerButton = new GuiButtonMineyGame(157, 144, 12, 12, BUTTON_CONFIG_DECLINE, this::onDeclineWagerButtonPress);
@@ -114,7 +122,9 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
     }
 
     protected void init() {
+        // super constructor
         super.init();
+        // add buttons
         this.addRenderableWidget(this.joinLeaveWhiteButton.relative(this));
         this.addRenderableWidget(this.joinLeaveBlackButton.relative(this));
         this.addRenderableWidget(this.readyButton.relative(this)).disable();
@@ -123,11 +133,20 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
         this.addRenderableWidget(this.drawButton.relative(this)).disable();
         this.addRenderableWidget(this.acceptDrawButton.relative(this)).disable();
         this.addRenderableWidget(this.declineDrawButton.relative(this)).disable();
+        this.addRenderableWidget(this.showClockButton).relative(this);
         this.addRenderableWidget(this.showWagerButton.relative(this));
         this.addRenderableWidget(this.proposeWagerButton.relative(this).disable().hide());
         this.addRenderableWidget(this.acceptWagerButton.relative(this)).disable().hide();
         this.addRenderableWidget(this.declineWagerButton.relative(this).disable()).hide();
-        this.disablePlayerInventorySlots();
+        // check clock and wagering visibility
+        // TODO
+        // wagering visibility
+        if(this.wagering) {
+            this.enablePlayerInventorySlots();
+        } else {
+            this.disablePlayerInventorySlots();
+        }
+        // update the gui
         this.updateGuiState();
     }
 
@@ -219,12 +238,38 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
         int relX = (this.width - this.imageWidth) / 2;
         int relY = (this.height - this.imageHeight) / 2;
         if(this.wagering) {
-            // full texture
-            this.blit(transforms, relX, relY, 0, 0, this.imageWidth, this.imageHeight);
+            if(this.clock) {
+                // full texture, excluding edges for the clock
+                this.blit(transforms, relX + EDGE_WIDTH, relY, EDGE_WIDTH, 0, this.imageWidth - 2*EDGE_WIDTH, this.imageHeight);
+                // left edge below clock
+                blit(transforms, relX, relY + CLOCK_HEIGHT, 0, CLOCK_HEIGHT, EDGE_WIDTH, this.imageHeight - CLOCK_HEIGHT);
+                // right edge below clock
+                blit(transforms, relX + this.imageWidth - EDGE_WIDTH, relY + CLOCK_HEIGHT, this.imageWidth - EDGE_WIDTH, CLOCK_HEIGHT, EDGE_WIDTH, this.imageHeight - CLOCK_HEIGHT);
+            } else {
+                // full texture
+                this.blit(transforms, relX, relY, 0, 0, this.imageWidth , this.imageHeight);
+            }
         } else {
             // exclude wagering
-            this.blit(transforms, relX, relY, 0, 0, this.imageWidth, Y_SPLIT_1);
+            if(this.clock) {
+                // partial texture, excluding edges for the clock
+                this.blit(transforms, relX + EDGE_WIDTH, relY, EDGE_WIDTH, 0, this.imageWidth - 2*EDGE_WIDTH, Y_SPLIT_1);
+                // left edge below clock
+                blit(transforms, relX, relY + CLOCK_HEIGHT, 0, CLOCK_HEIGHT, EDGE_WIDTH, Y_SPLIT_1 - CLOCK_HEIGHT);
+                // right edge below clock
+                blit(transforms, relX + this.imageWidth - EDGE_WIDTH, relY + CLOCK_HEIGHT, this.imageWidth - EDGE_WIDTH, CLOCK_HEIGHT, EDGE_WIDTH, Y_SPLIT_1 - CLOCK_HEIGHT);
+            } else {
+                // partial texture
+                this.blit(transforms, relX, relY, 0, 0, this.imageWidth, Y_SPLIT_1);
+            }
+            // wagering window
             this.blit(transforms, relX, relY + Y_SPLIT_1, 0, Y_SPLIT_2, this.imageWidth, 6);
+        }
+        if(this.clock) {
+            // draw left clock
+            blit(transforms, relX - CLOCK_WIDTH + EDGE_WIDTH, relY, this.imageWidth, CLOCK_HEIGHT, CLOCK_WIDTH, CLOCK_HEIGHT, 256, 256);
+            // draw right clock
+            blit(transforms, relX + this.imageWidth - EDGE_WIDTH, relY, this.imageWidth, 0, CLOCK_WIDTH, CLOCK_HEIGHT, 256, 256);
         }
     }
 
@@ -313,6 +358,10 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
 
     protected void onDeclineDrawButtonPress() {
 
+    }
+
+    protected void onShowClockButtonPress() {
+        this.clock = !this.clock;
     }
 
     protected void onProposeButtonPress() {
