@@ -97,16 +97,6 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         return InteractionResult.PASS;
     }
 
-    private static void togglePlayerDebug(Participant participant, Player player) {
-        if(participant.hasPlayer()) {
-            if(participant.isPlayer(player)) {
-                participant.removePlayer();
-            }
-        } else {
-            participant.setPlayer(player);
-        }
-    }
-
     public void startGame() {
         if(this.isRunning()) {
             return;
