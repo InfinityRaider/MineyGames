@@ -71,13 +71,20 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
     @Override
     public InteractionResult onRightClick(Player player, InteractionHand hand, BlockHitResult hit) {
         if(player.getLevel().isClientSide()) {
+            // run logic only on the server
+            return InteractionResult.PASS;
+        }
+        if(hand == InteractionHand.OFF_HAND) {
+            // only interact with main hand
             return InteractionResult.PASS;
         }
         if(player.isDiscrete()) {
+            // if the player is sneaking, open the gui
             if(player instanceof ServerPlayer) {
                 NetworkHooks.openGui((ServerPlayer) player, this.getTable(), this.getTable().getBlockPos());
             }
         } else {
+            // interact with the chess board
             this.asParticipant(player).ifPresent(participant -> this.getGame()
                     .map(ChessGame::getCurrentParticipant)
                     .map(ChessGame.Participant::getColour)
@@ -595,8 +602,8 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                         return Optional.empty();
                     });
                 }
-            } else {
-                // there is no selected square
+            } else if(hovered){
+                // there is no selected square, but the square is hovered over
                 return this.getSquare(relX, relY).map(square -> {
                     // check if there is a piece
                     return square.getPiece().map(piece -> {
@@ -605,7 +612,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                                 // hovering over a piece without valid moves; highlight yellow
                                 return HighLights.YELLOW;
                             } else {
-                                // hovering over a piece wiht valid moves; highlight green
+                                // hovering over a piece with valid moves; highlight green
                                 return HighLights.GREEN;
                             }
                         } else {
@@ -616,6 +623,8 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                     }).orElse(HighLights.BLUE);
                 });
             }
+            // no highlights
+            return Optional.empty();
         }
 
         protected void reset() {
