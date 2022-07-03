@@ -172,6 +172,11 @@ public class ChessBoard {
             return this;
         }
 
+        @Override
+        public String toString() {
+            return this.getCoordinates();
+        }
+
         protected static String buildCoordinates(int x, int y) {
             return "" + (char) ('a' + x) + (y + 1);
         }

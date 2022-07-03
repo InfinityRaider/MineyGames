@@ -142,6 +142,11 @@ public class ChessPiece {
         this.attacked = false;
     }
 
+    @Override
+    public String toString() {
+        return this.getType() + "_" + this.getColour();
+    }
+
     public static abstract class Type {
         private static final Map<String, Type> TYPES = Maps.newHashMap();
 
@@ -201,6 +206,11 @@ public class ChessPiece {
                     return Optional.of(ChessMove.move(piece, square));
                 }
             });
+        }
+
+        @Override
+        public String toString() {
+            return this.getName();
         }
     }
 

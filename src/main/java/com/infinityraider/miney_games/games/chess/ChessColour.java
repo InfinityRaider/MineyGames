@@ -53,6 +53,11 @@ public class ChessColour {
         return this.b;
     }
 
+    @Override
+    public String toString() {
+        return this.getName();
+    }
+
     public static ChessColour fromName(String name) {
         return COLOURS.get(name);
     }
