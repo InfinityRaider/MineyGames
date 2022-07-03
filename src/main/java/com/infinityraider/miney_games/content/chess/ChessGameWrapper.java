@@ -159,9 +159,11 @@ public class ChessGameWrapper extends GameWrapper {
             return Optional.empty();
         }
         Vec3 abs = this.getTable().offsetAbs(hit.getLocation());
+        int i_abs = this.getTable().getChessSquareIndexAbsX(abs);
+        int j_abs = this.getTable().getChessSquareIndexAbsY(abs);
         return this.getSquare(
-                this.getTable().getChessSquareIndexAbsX(abs),
-                this.getTable().getChessSquareIndexAbsY(abs)
+                this.getTable().iAbsToRel(i_abs, j_abs),
+                this.getTable().jAbsToRel(i_abs, j_abs)
         );
     }
 
