@@ -68,7 +68,7 @@ public class ChessGame {
     }
 
     public Optional<Participant> getCurrentParticipant() {
-        if(this.currentParticipant >= 0 && this.currentParticipant < this.getParticipants().size() - 1) {
+        if(this.currentParticipant >= 0 && this.currentParticipant < this.getParticipants().size()) {
             return Optional.of(this.getParticipants().get(this.currentParticipant));
         }
         return Optional.empty();
@@ -120,7 +120,7 @@ public class ChessGame {
         // increment participant counter
         this.currentParticipant++;
         // increment turn counter if needed
-        if(this.currentParticipant == this.getParticipants().size() - 1) {
+        if(this.currentParticipant >= this.getParticipants().size()) {
             this.currentParticipant = 0;
             this.currentTurn++;
         }
