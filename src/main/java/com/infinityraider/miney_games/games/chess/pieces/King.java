@@ -39,7 +39,8 @@ public class King extends ChessPiece.Type {
         this.checkSquare(king, 1, 0).ifPresent(move -> this.checkAndAddMove(king, move, moves));
         this.checkSquare(king, 1, 1).ifPresent(move -> this.checkAndAddMove(king, move, moves));
         // check for castling
-        if(!king.hasMoved()) {
+        if(!king.hasMoved() && !this.isSquareWatched(king, king.currentSquare())) {
+            // fetch the rooks which haven't moved yet
             king.getBoard().streamPieces()
                     .filter(piece -> piece.getColour() == king.getColour())
                     .filter(piece -> !piece.hasMoved())
@@ -57,7 +58,6 @@ public class King extends ChessPiece.Type {
         }
         // return the moves
         return moves;
-
     }
 
     protected void checkAndAddMove(ChessPiece king, ChessMove move, Set<ChessMove> moves) {
@@ -77,19 +77,20 @@ public class King extends ChessPiece.Type {
     protected Optional<ChessMove> checkCastleSquares(ChessPiece king, ChessPiece rook, int dx, int dy) {
         ChessBoard.Square kingSquare = king.currentSquare();
         ChessBoard.Square rookSquare = rook.currentSquare();
-        int x = kingSquare.getX();
-        int y = kingSquare.getY();
+        int x = kingSquare.getX() + dx;
+        int y = kingSquare.getY() + dy;
         int count = 0;
         while(x != rookSquare.getX() || y != rookSquare.getY()) {
-            x += dx;
-            y += dy;
+            // increment checked square count
             count += 1;
             final int copyCount = count;
-            boolean blocked = king.offset(x, y).map(square -> {
+            boolean blocked = king.getBoard().getSquare(x, y).map(square -> {
+                // there may currently not be a piece on a square between the king and the rook
                 if(square.getPiece().isPresent()) {
                     // there is a piece between the rook and the king
                     return true;
                 }
+                // the first two squares may not be attacked in order to allow castling
                 if(copyCount <= 2) {
                     // check if the square is under attack
                     if(this.isSquareWatched(king, square)) {
@@ -99,10 +100,15 @@ public class King extends ChessPiece.Type {
                 // the way for castling is free
                 return false;
             }).orElse(true);
+            // if the square is blocked, return
             if(blocked) {
                 return Optional.empty();
             }
+            // increment coordinates
+            x += dx;
+            y += dy;
         }
+        // castling is possible
         return Optional.of(ChessMove.castle(king, rook));
     }
 }
