@@ -280,7 +280,7 @@ public class ChessGame {
                     // iterate over all pieces of different colours
                     .filter(piece -> piece.getColour() != this.getColour())
                     // check all their potential moves
-                    .map(ChessPiece::getPotentialMoves)
+                    .map(ChessPiece::scanPotentialMoves)
                     .flatMap(Collection::stream)
                     // only consider moves that would capture a piece
                     .filter(move -> move.getType().isCapture())

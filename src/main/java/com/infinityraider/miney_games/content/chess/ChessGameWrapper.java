@@ -585,7 +585,7 @@ public class ChessGameWrapper extends GameWrapper {
                     .orElse(false);
             if (check) {
                 // the king is in check
-                return Optional.of(hovered || this.selected.is(relX, relY)
+                return Optional.of(hovered || (this.selected != null && this.selected.is(relX, relY))
                         // if the king is selected or hovered over, mark it purple
                         ? HighLights.PURPLE
                         // if the king is not selected or hovered over, mark it red
