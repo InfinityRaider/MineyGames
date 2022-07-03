@@ -1,29 +1,22 @@
 package com.infinityraider.miney_games.network.chess;
 
-import com.infinityraider.infinitylib.network.MessageBase;
-import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.content.chess.TileChessTable;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 
-public abstract class MessageChessGameStart extends MessageBase {
-    private TileChessTable table;
-
+public abstract class MessageChessGameStart extends MessageChessBase {
     public MessageChessGameStart() {
         super();
     }
 
     private MessageChessGameStart(TileChessTable table) {
-        this();
-        this.table = table;
+        super(table);
     }
 
     @Override
-    protected void processMessage(NetworkEvent.Context ctx) {
-        if(this.table != null) {
-            this.table.getWrapper().startGame();
-            MineyGames.instance.proxy().updateMineyGameGui();
-        }
+    protected boolean handleMessage(NetworkEvent.Context ctx) {
+        this.getTable().getWrapper().startGame();
+        return true;
     }
 
     public static class ToClient extends MessageChessGameStart {

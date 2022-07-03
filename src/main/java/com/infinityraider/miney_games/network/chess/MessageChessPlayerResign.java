@@ -1,13 +1,10 @@
 package com.infinityraider.miney_games.network.chess;
 
-import com.infinityraider.infinitylib.network.MessageBase;
-import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.content.chess.TileChessTable;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 
-public abstract class MessageChessPlayerResign extends MessageBase {
-    private TileChessTable table;
+public abstract class MessageChessPlayerResign extends MessageChessBase {
     private boolean p1;
 
     public MessageChessPlayerResign() {
@@ -15,17 +12,18 @@ public abstract class MessageChessPlayerResign extends MessageBase {
     }
 
     private MessageChessPlayerResign(TileChessTable table, boolean p1) {
-        this();
-        this.table = table;
+        super(table);
         this.p1 = p1;
     }
 
     @Override
-    protected void processMessage(NetworkEvent.Context ctx) {
-        if(this.table != null) {
-            this.table.getWrapper().resign(this.p1);
-            MineyGames.instance.proxy().updateMineyGameGui();
+    protected boolean handleMessage(NetworkEvent.Context ctx) {
+        // safety check
+        if(!this.verifySender(ctx, this.p1)) {
+            this.getTable().getWrapper().resign(this.p1);
+            return true;
         }
+        return false;
     }
 
     public static class ToClient extends MessageChessPlayerResign {

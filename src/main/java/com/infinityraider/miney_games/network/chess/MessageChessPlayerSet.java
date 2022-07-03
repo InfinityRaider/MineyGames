@@ -1,7 +1,5 @@
 package com.infinityraider.miney_games.network.chess;
 
-import com.infinityraider.infinitylib.network.MessageBase;
-import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.content.chess.TileChessTable;
 import net.minecraft.Util;
 import net.minecraftforge.network.NetworkDirection;
@@ -9,8 +7,7 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.UUID;
 
-public abstract class MessageChessPlayerSet extends MessageBase {
-    private TileChessTable table;
+public abstract class MessageChessPlayerSet extends MessageChessBase {
     private boolean p1;
     private UUID id;
 
@@ -23,22 +20,19 @@ public abstract class MessageChessPlayerSet extends MessageBase {
     }
 
     private MessageChessPlayerSet(TileChessTable table, boolean p1, UUID id) {
-        this();
-        this.table = table;
+        super(table);
         this.p1 = p1;
         this.id = id;
     }
 
     @Override
-    protected void processMessage(NetworkEvent.Context ctx) {
-        if(this.table != null) {
-            if(this.p1) {
-                this.table.getWrapper().getPlayer1().setPlayer(this.id);
-            } else {
-                this.table.getWrapper().getPlayer2().setPlayer(this.id);
-            }
-            MineyGames.instance.proxy().updateMineyGameGui();
+    protected boolean handleMessage(NetworkEvent.Context ctx) {
+        if(this.p1) {
+            this.getTable().getWrapper().getPlayer1().setPlayer(this.id);
+        } else {
+            this.getTable().getWrapper().getPlayer2().setPlayer(this.id);
         }
+        return true;
     }
 
     public static class ToClient extends MessageChessPlayerSet {
