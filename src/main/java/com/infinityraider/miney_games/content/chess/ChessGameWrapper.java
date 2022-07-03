@@ -519,16 +519,15 @@ public class ChessGameWrapper extends GameWrapper {
                 return;
             }
             if(this.selected == null) {
-                if(this.selectSquare(square)) {
-                    this.selected = square;
+                if(this.trySelectSquare(square)) {
                     new MessageSelectSquare(this.getTable(), square).sendTo(player);
                 }
             } else {
-                if(this.selected.equals(square)) {
+                if(this.selected.equals(square) || this.makeMove(square)) {
                     this.deselectSquare();
                     new MessageSelectSquare(this.getTable()).sendTo(player);
-                } else if(this.makeMove(square)) {
-                    this.selected = null;
+                } else if(this.trySelectSquare(square)) {
+                    new MessageSelectSquare(this.getTable(), square).sendTo(player);
                 }
             }
         }
@@ -537,14 +536,14 @@ public class ChessGameWrapper extends GameWrapper {
             this.selected = null;
         }
 
-        public boolean selectSquare(int x, int y) {
+        public boolean trySelectSquare(int x, int y) {
             return this.getGame().map(ChessGame::getBoard)
                     .flatMap(board -> board.getSquare(x, y))
-                    .map(this::selectSquare)
+                    .map(this::trySelectSquare)
                     .orElse(false);
         }
 
-        protected boolean selectSquare(ChessBoard.Square square) {
+        protected boolean trySelectSquare(ChessBoard.Square square) {
             if(this.canSelect(square)) {
                 this.selected = square;
                 return true;

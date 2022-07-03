@@ -44,7 +44,7 @@ public class MessageSelectSquare extends MessageBase {
                         if (this.x < 0 || this.y < 0) {
                             p.deselectSquare();
                         } else {
-                            if(!p.selectSquare(this.x, this.y)) {
+                            if(!p.trySelectSquare(this.x, this.y)) {
                                 MineyGames.instance.getLogger().error("Failed to select square on client: [" + this.x + ", " + this.y + "]" );
                             }
                         }
