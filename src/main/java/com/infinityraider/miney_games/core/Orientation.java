@@ -7,6 +7,8 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 
+import static net.minecraft.core.Direction.Axis.X;
+
 /** Wrapper for direction to allow easy rotation of x and y coordinates */
 public enum Orientation implements StringRepresentable {
     NORTH(Direction.NORTH),
@@ -19,7 +21,8 @@ public enum Orientation implements StringRepresentable {
 
     Orientation(Direction dir) {
         this.dir = dir;
-        this.rotation = Vector3f.YP.rotationDegrees(this.getDirection().toYRot());
+        // need to flip the west and east rotations since minecraft uses a left-handed coordinate system
+        this.rotation = Vector3f.YP.rotationDegrees((this.getAxis() == X ? this.getDirection().getOpposite() : this.getDirection()).toYRot());
     }
 
     public Direction getDirection() {
@@ -28,10 +31,10 @@ public enum Orientation implements StringRepresentable {
 
     public int xRelToAbs(int xRel, int yRel, int xSizeRel, int ySizeRel) {
         return switch (this) {
-            case NORTH -> xSizeRel - xRel - 1;
-            case SOUTH -> xRel;
-            case WEST -> yRel;
-            case EAST -> ySizeRel - yRel - 1;
+            case NORTH -> xRel;
+            case SOUTH -> xSizeRel - xRel - 1;
+            case WEST -> ySizeRel - yRel - 1;
+            case EAST -> yRel;
         };
     }
 
@@ -39,17 +42,17 @@ public enum Orientation implements StringRepresentable {
         return switch (this) {
             case NORTH -> ySizeRel - yRel - 1;
             case SOUTH -> yRel;
-            case WEST -> xRel;
-            case EAST -> xSizeRel - xRel - 1;
+            case WEST -> xSizeRel - xRel - 1;
+            case EAST -> xRel;
         };
     }
 
     public int xAbsToRel(int xAbs, int yAbs, int xSizeRel, int ySizeRel) {
         return switch (this) {
-            case NORTH -> xSizeRel - xAbs - 1;
-            case SOUTH -> xAbs;
-            case WEST -> yAbs;
-            case EAST -> ySizeRel - yAbs - 1;
+            case NORTH -> xAbs;
+            case SOUTH -> xSizeRel - xAbs - 1;
+            case WEST -> ySizeRel - yAbs - 1;
+            case EAST -> yAbs;
         };
     }
 
@@ -57,8 +60,8 @@ public enum Orientation implements StringRepresentable {
         return switch (this) {
             case NORTH -> ySizeRel - yAbs - 1;
             case SOUTH -> yAbs;
-            case WEST -> xAbs;
-            case EAST -> xSizeRel - xAbs - 1;
+            case WEST -> xSizeRel - xAbs - 1;
+            case EAST -> xAbs;
         };
     }
 
