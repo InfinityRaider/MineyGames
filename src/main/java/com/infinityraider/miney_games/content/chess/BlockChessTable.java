@@ -115,6 +115,10 @@ public class BlockChessTable extends BlockMineyGame<TileChessTable> {
             double squareSize = (max - min)/SQUARES;
             return min + squareSize*(1 + square);
         }
+
+        public double getPieceScale() {
+            return this.getSquareSize()*(TEX_SIZE - 2*MARGIN + 0.0)/(TEX_SIZE);
+        }
     }
 
     public static class HitBoxes {

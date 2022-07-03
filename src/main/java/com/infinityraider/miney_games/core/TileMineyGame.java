@@ -17,7 +17,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class TileMineyGame<B extends BlockMineyGame<?>, W extends GameWrapper<?>> extends TileEntityBase {
+public abstract class TileMineyGame<B extends BlockMineyGame<?>, W extends GameWrapper> extends TileEntityBase {
     public TileMineyGame(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }

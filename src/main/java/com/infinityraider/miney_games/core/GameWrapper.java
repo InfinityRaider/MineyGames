@@ -8,9 +8,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.Optional;
 
-public abstract class GameWrapper<G> {
-    public abstract Optional<G> getGame();
-
+public abstract class GameWrapper{
     protected abstract void tick();
 
     protected abstract InteractionResult onRightClick(Player player, InteractionHand hand, BlockHitResult hit);

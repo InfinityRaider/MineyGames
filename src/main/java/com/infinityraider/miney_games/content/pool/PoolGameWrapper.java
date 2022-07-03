@@ -10,14 +10,13 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.Optional;
 
-public class PoolGameWrapper extends GameWrapper<PoolGame> {
+public class PoolGameWrapper extends GameWrapper {
     private PoolGame game;
 
     protected PoolGameWrapper() {
 
     }
 
-    @Override
     public Optional<PoolGame> getGame() {
         return Optional.ofNullable(this.game);
     }

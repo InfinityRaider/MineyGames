@@ -4,15 +4,20 @@ import com.infinityraider.infinitylib.container.IInfinityContainerMenuType;
 import com.infinityraider.infinitylib.proxy.base.IClientProxyBase;
 import com.infinityraider.miney_games.client.gui.GuiMineyGame;
 import com.infinityraider.miney_games.client.gui.chess.ChessTableGui;
+import com.infinityraider.miney_games.client.handler.ModelHandler;
 import com.infinityraider.miney_games.config.Config;
 import com.infinityraider.miney_games.content.chess.ContainerChessTable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.eventbus.api.IEventBus;
 
 import java.util.function.Function;
 
+@OnlyIn(Dist.CLIENT)
 public class ClientProxy implements IProxy, IClientProxyBase<Config> {
     @Override
     public Function<ForgeConfigSpec.Builder, Config> getConfigConstructor() {
@@ -22,6 +27,12 @@ public class ClientProxy implements IProxy, IClientProxyBase<Config> {
     @Override
     public void registerEventHandlers() {
 
+    }
+
+    @Override
+    public void registerModBusEventHandlers(IEventBus bus) {
+        IProxy.super.registerModBusEventHandlers(bus);
+        bus.addListener(ModelHandler.getInstance()::registerSpecialModels);
     }
 
     @Override

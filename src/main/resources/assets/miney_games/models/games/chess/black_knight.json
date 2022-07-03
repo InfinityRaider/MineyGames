@@ -1,0 +1,130 @@
+{
+	"textures": {
+		"0": "miney_games:games/chess/black",
+		"particle": "miney_games:games/chess/black"
+	},
+	"elements": [
+		{
+			"name": "base",
+			"from": [2, 0, 2],
+			"to": [14, 2, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 12, 2], "texture": "#0"},
+				"east": {"uv": [0, 0, 12, 2], "texture": "#0"},
+				"south": {"uv": [0, 0, 12, 2], "texture": "#0"},
+				"west": {"uv": [0, 0, 12, 2], "texture": "#0"},
+				"up": {"uv": [0, 0, 12, 12], "texture": "#0"}
+			}
+		},
+		{
+			"name": "pillar",
+			"from": [4, 2, 4],
+			"to": [12, 6, 12],
+			"faces": {
+				"north": {"uv": [0, 0, 8, 4], "texture": "#0"},
+				"east": {"uv": [0, 0, 8, 4], "texture": "#0"},
+				"south": {"uv": [0, 0, 8, 4], "texture": "#0"},
+				"west": {"uv": [0, 0, 8, 4], "texture": "#0"},
+				"up": {"uv": [0, 0, 8, 8], "texture": "#0"}
+			}
+		},
+		{
+			"name": "body",
+			"from": [6, 3.7, 4.4],
+			"to": [10, 19.7, 12.4],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [8, 6, 10]},
+			"faces": {
+				"north": {"uv": [0, 0, 4, 16], "texture": "#0"},
+				"east": {"uv": [0, 0, 8, 16], "texture": "#0"},
+				"south": {"uv": [0, 0, 4, 16], "texture": "#0"},
+				"west": {"uv": [0, 0, 8, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 4, 8], "texture": "#0"}
+			}
+		},
+		{
+			"name": "head",
+			"from": [6.001, 16.8, 1.1],
+			"to": [9.999, 20.8, 10.1],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 20.8, 10.1]},
+			"faces": {
+				"north": {"uv": [0, 0, 3.998, 4], "texture": "#0"},
+				"east": {"uv": [0, 0, 9, 4], "texture": "#0"},
+				"west": {"uv": [0, 0, 9, 4], "texture": "#0"},
+				"up": {"uv": [0, 0, 3.998, 9], "texture": "#0"},
+				"down": {"uv": [0, 0, 3.998, 9], "texture": "#0"}
+			}
+		},
+		{
+			"name": "mane_start",
+			"from": [6.999, 20.72, 6.45],
+			"to": [8.997, 21.72, 10.45],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 21.72, 10.45]},
+			"faces": {
+				"north": {"uv": [0, 0, 1.998, 1], "texture": "#0"},
+				"east": {"uv": [0, 0, 4, 1], "texture": "#0"},
+				"west": {"uv": [0, 0, 4, 1], "texture": "#0"},
+				"up": {"uv": [0, 0, 1.998, 4], "texture": "#0"}
+			}
+		},
+		{
+			"name": "mane_top",
+			"from": [7, 19.7, 4.4],
+			"to": [9, 20.7, 13.4],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [8, 6, 10]},
+			"faces": {
+				"east": {"uv": [0, 0, 9, 1], "texture": "#0"},
+				"south": {"uv": [0, 0, 2, 1], "texture": "#0"},
+				"west": {"uv": [0, 0, 9, 1], "texture": "#0"},
+				"up": {"uv": [0, 0, 2, 9], "texture": "#0"}
+			}
+		},
+		{
+			"name": "mane_back",
+			"from": [7, 10.7, 12.4],
+			"to": [9, 19.7, 13.4],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [8, 6, 10]},
+			"faces": {
+				"east": {"uv": [0, 0, 1, 9], "texture": "#0"},
+				"south": {"uv": [0, 0, 2, 9], "texture": "#0"},
+				"west": {"uv": [0, 0, 1, 9], "texture": "#0"}
+			}
+		},
+		{
+			"name": "mane_end",
+			"from": [6.999, 6.1, 13.95],
+			"to": [8.997, 9.1, 14.95],
+			"rotation": {"angle": 45, "axis": "x", "origin": [8, 9.1, 14.95]},
+			"faces": {
+				"east": {"uv": [0, 0, 3, 1], "rotation": 270, "texture": "#0"},
+				"south": {"uv": [0, 0, 1.998, 3], "texture": "#0"},
+				"west": {"uv": [0, 0, 3, 1], "rotation": 90, "texture": "#0"}
+			}
+		},
+		{
+			"name": "ear_right",
+			"from": [5.999, 19.8, 9.1],
+			"to": [7, 22.8, 11.1],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 20.8, 10.1]},
+			"faces": {
+				"north": {"uv": [0, 0, 1.001, 3], "texture": "#0"},
+				"east": {"uv": [0, 0, 2, 3], "texture": "#0"},
+				"south": {"uv": [0, 0, 1.001, 3], "texture": "#0"},
+				"west": {"uv": [0, 0, 2, 3], "texture": "#0"},
+				"up": {"uv": [0, 0, 1.001, 2], "texture": "#0"}
+			}
+		},
+		{
+			"name": "ear_right",
+			"from": [9, 19.8, 9.1],
+			"to": [10.001, 22.8, 11.1],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 20.8, 10.1]},
+			"faces": {
+				"north": {"uv": [0, 0, 1.001, 3], "texture": "#0"},
+				"east": {"uv": [0, 0, 2, 3], "texture": "#0"},
+				"south": {"uv": [0, 0, 1.001, 3], "texture": "#0"},
+				"west": {"uv": [0, 0, 2, 3], "texture": "#0"},
+				"up": {"uv": [0, 0, 1.001, 2], "texture": "#0"}
+			}
+		}
+	]
+}

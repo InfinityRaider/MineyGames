@@ -33,7 +33,7 @@ import java.util.UUID;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class GuiMineyGame<C extends ContainerMineyGame<T, G>, T extends TileMineyGame<?, G>, G extends GameWrapper<?>> extends AbstractContainerScreen<C> {
+public abstract class GuiMineyGame<C extends ContainerMineyGame<T, G>, T extends TileMineyGame<?, G>, G extends GameWrapper> extends AbstractContainerScreen<C> {
     private final List<GuiButtonMineyGame> buttons;
     private final Set<Tickable> tickables;
 

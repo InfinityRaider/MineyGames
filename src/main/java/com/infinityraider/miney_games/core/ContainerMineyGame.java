@@ -10,7 +10,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ContainerMineyGame<T extends TileMineyGame<?, W>, W extends GameWrapper<?>> extends ContainerMenuBase {
+public class ContainerMineyGame<T extends TileMineyGame<?, W>, W extends GameWrapper> extends ContainerMenuBase {
     @Nullable
     private final T tile;
 

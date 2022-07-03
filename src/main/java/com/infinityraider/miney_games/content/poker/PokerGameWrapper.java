@@ -10,10 +10,9 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.Optional;
 
-public class PokerGameWrapper extends GameWrapper<PokerGame> {
+public class PokerGameWrapper extends GameWrapper {
     private PokerGame game;
 
-    @Override
     public Optional<PokerGame> getGame() {
         return Optional.ofNullable(this.game);
     }

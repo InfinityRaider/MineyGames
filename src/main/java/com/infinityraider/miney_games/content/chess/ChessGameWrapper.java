@@ -1,5 +1,6 @@
 package com.infinityraider.miney_games.content.chess;
 
+import com.google.common.collect.ImmutableMap;
 import com.infinityraider.miney_games.MineyGames;
 import com.infinityraider.miney_games.core.GameWrapper;
 import com.infinityraider.miney_games.core.PlayerState;
@@ -24,7 +25,7 @@ import net.minecraftforge.network.NetworkHooks;
 import java.util.*;
 import java.util.List;
 
-public class ChessGameWrapper extends GameWrapper<ChessGame> {
+public class ChessGameWrapper extends GameWrapper {
     private final TileChessTable table;
     private final Settings settings;
 
@@ -45,8 +46,7 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         return this.table;
     }
 
-    @Override
-    public Optional<ChessGame> getGame() {
+    protected Optional<ChessGame> getGame() {
         return Optional.ofNullable(this.game);
     }
 
@@ -60,6 +60,16 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
 
     public Participant getPlayer2() {
         return this.player2;
+    }
+
+    public Optional<Participant> getPlayer(ChessColour colour) {
+        if (this.getPlayer1().getColour().getName().equals(colour.getName())) {
+            return Optional.of(this.getPlayer1());
+        }
+        if (this.getPlayer2().getColour().getName().equals(colour.getName())) {
+            return Optional.of(this.getPlayer2());
+        }
+        return Optional.empty();
     }
 
     protected void tick() {
@@ -126,13 +136,18 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
     }
 
     public Optional<Participant> asParticipant(Player player) {
-        if(this.isPlayer1(player)) {
-            return Optional.of(this.getPlayer1());
-        }
-        if(this.isPlayer2(player)) {
-            return Optional.of(this.getPlayer2());
-        }
-        return Optional.empty();
+        return this.getGame().map(ChessGame::getCurrentParticipant)
+                .map(ChessGame.Participant::getColour)
+                .map(this::getPlayer)
+                .orElseGet(() -> {
+                    if (this.isPlayer1(player)) {
+                        return Optional.of(this.getPlayer1());
+                    }
+                    if (this.isPlayer2(player)) {
+                        return Optional.of(this.getPlayer2());
+                    }
+                    return Optional.empty();
+                });
     }
 
     protected Optional<ChessMove> getLastMove() {
@@ -158,6 +173,14 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
                 .map(ChessGame::getBoard)
                 .flatMap(board -> board.getSquare(x, y));
 
+    }
+
+    public Optional<Piece> getPiece(int x, int y) {
+        return this.getGame()
+                .map(ChessGame::getBoard)
+                .flatMap(board -> board.getSquare(x, y))
+                .flatMap(ChessBoard.Square::getPiece)
+                .flatMap(Piece::convert);
     }
 
     protected boolean makeMoveServer(ChessBoard.Square from, ChessBoard.Square to) {
@@ -691,5 +714,58 @@ public class ChessGameWrapper extends GameWrapper<ChessGame> {
         public void readFromTag(CompoundTag tag) {
             // TODO
         }
+    }
+
+    public enum Piece {
+        WHITE_PAWN(true),
+        WHITE_ROOK(true),
+        WHITE_KNIGHT(true),
+        WHITE_BISHOP(true),
+        WHITE_QUEEN(true),
+        WHITE_KING(true),
+        BLACK_PAWN(false),
+        BLACK_ROOK(false),
+        BLACK_KNIGHT(false),
+        BLACK_BISHOP(false),
+        BLACK_QUEEN(false),
+        BLACK_KING(false);
+
+        private final boolean white;
+
+        Piece(boolean white) {
+            this.white = white;
+        }
+
+        public boolean isWhite() {
+            return this.white;
+        }
+
+        protected static Optional<Piece> convert(ChessPiece piece) {
+            if(piece.isColour(ChessColour.WHITE)) {
+                return Optional.ofNullable(WHITE.get(piece.getType()));
+            }
+            if(piece.isColour(ChessColour.BLACK)) {
+                return Optional.ofNullable(BLACK.get(piece.getType()));
+            }
+            return Optional.empty();
+        }
+
+        private static final Map<ChessPiece.Type, Piece> WHITE = ImmutableMap.of(
+                ChessPiece.Pieces.PAWN, WHITE_PAWN,
+                ChessPiece.Pieces.ROOK, WHITE_ROOK,
+                ChessPiece.Pieces.KNIGHT, WHITE_KNIGHT,
+                ChessPiece.Pieces.BISHOP, WHITE_BISHOP,
+                ChessPiece.Pieces.QUEEN, WHITE_QUEEN,
+                ChessPiece.Pieces.KING, WHITE_KING
+        );
+
+        private static final Map<ChessPiece.Type, Piece> BLACK = ImmutableMap.of(
+                ChessPiece.Pieces.PAWN, BLACK_PAWN,
+                ChessPiece.Pieces.ROOK, BLACK_ROOK,
+                ChessPiece.Pieces.KNIGHT, BLACK_KNIGHT,
+                ChessPiece.Pieces.BISHOP, BLACK_BISHOP,
+                ChessPiece.Pieces.QUEEN, BLACK_QUEEN,
+                ChessPiece.Pieces.KING, BLACK_KING
+        );
     }
 }

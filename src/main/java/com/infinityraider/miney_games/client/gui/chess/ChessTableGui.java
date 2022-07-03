@@ -9,6 +9,7 @@ import com.infinityraider.miney_games.content.chess.ContainerChessTable;
 import com.infinityraider.miney_games.content.chess.TileChessTable;
 import com.infinityraider.miney_games.core.PlayerState;
 import com.infinityraider.miney_games.network.chess.MessageChessPlayerReady;
+import com.infinityraider.miney_games.network.chess.MessageChessPlayerResign;
 import com.infinityraider.miney_games.network.chess.MessageChessPlayerSet;
 import com.infinityraider.miney_games.network.chess.MessageChessGameStart;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -345,7 +346,12 @@ public class ChessTableGui extends GuiMineyGame<ContainerChessTable, TileChessTa
     }
 
     protected void onResignButtonPress() {
-
+        if(this.isPlayer1()) {
+            new MessageChessPlayerResign.ToServer(this.getTile(), true);
+        }
+        if(this.isPlayer2()) {
+            new MessageChessPlayerResign.ToServer(this.getTile(), false);
+        }
     }
 
     protected void onDrawButtonPress() {

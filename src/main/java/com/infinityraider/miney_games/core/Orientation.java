@@ -1,5 +1,7 @@
 package com.infinityraider.miney_games.core;
 
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Mirror;
@@ -13,9 +15,11 @@ public enum Orientation implements StringRepresentable {
     EAST(Direction.EAST);
 
     private final Direction dir;
+    private final Quaternion rotation;
 
     Orientation(Direction dir) {
         this.dir = dir;
+        this.rotation = Vector3f.YP.rotationDegrees(this.getDirection().toYRot());
     }
 
     public Direction getDirection() {
@@ -144,6 +148,10 @@ public enum Orientation implements StringRepresentable {
 
     public Orientation rotate(Rotation rotation) {
         return fromDirection(rotation.rotate(this.getDirection()));
+    }
+
+    public Quaternion getHorizontalRotation() {
+        return this.rotation;
     }
 
     @Override
