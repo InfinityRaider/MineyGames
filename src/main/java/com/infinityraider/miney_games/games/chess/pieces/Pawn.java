@@ -79,7 +79,7 @@ public class Pawn extends ChessPiece.Type {
                         return Optional.empty();
                     }
                     // if the piece is of the same colour, return
-                    if (piece.getColour() != pawn.getColour()) {
+                    if (piece.getColour().getName().equals(pawn.getColour().getName())) {
                         return Optional.empty();
                     }
                     // check if the pawn has made a double move last move
