@@ -96,7 +96,7 @@ public class ChessGameWrapper extends GameWrapper {
         } else {
             // interact with the chess board
             this.asParticipant(player).ifPresent(participant -> this.getGame()
-                    .map(ChessGame::getCurrentParticipant)
+                    .flatMap(ChessGame::getCurrentParticipant)
                     .map(ChessGame.Participant::getColour)
                     .ifPresent(colour -> {
                         if (colour.getName().equals(participant.getColour().getName())) {
@@ -136,7 +136,7 @@ public class ChessGameWrapper extends GameWrapper {
     }
 
     public Optional<Participant> asParticipant(Player player) {
-        return this.getGame().map(ChessGame::getCurrentParticipant)
+        return this.getGame().flatMap(ChessGame::getCurrentParticipant)
                 .map(ChessGame.Participant::getColour)
                 .map(this::getPlayer)
                 .orElseGet(() -> {
@@ -206,7 +206,7 @@ public class ChessGameWrapper extends GameWrapper {
             if(!game.getStatus().isGoing()) {
                 return false;
             }
-            if(game.getCurrentParticipant().getColour() != move.getPiece().getColour()) {
+            if(game.getCurrentParticipant().map(p -> p.getColour() != move.getPiece().getColour()).orElse(true)) {
                 return false;
             }
             game.makeMove(move);

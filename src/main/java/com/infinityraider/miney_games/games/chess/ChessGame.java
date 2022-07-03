@@ -41,9 +41,9 @@ public class ChessGame {
     public void start() {
         this.currentTurn = 0;
         this.currentParticipant = 0;
-        this.getCurrentParticipant().scanPotentialMoves();
+        this.getCurrentParticipantOrThrow().scanPotentialMoves();
         this.status = ChessGameStatus.ONGOING;
-        this.getCurrentParticipant().getClock().start();
+        this.getCurrentParticipantOrThrow().getClock().start();
     }
 
     public void tick() {
@@ -67,12 +67,19 @@ public class ChessGame {
         return this.participants;
     }
 
-    public Participant getCurrentParticipant() {
-        return this.getParticipants().get(this.currentParticipant);
+    public Optional<Participant> getCurrentParticipant() {
+        if(this.currentParticipant >= 0 && this.currentParticipant < this.getParticipants().size() - 1) {
+            return Optional.of(this.getParticipants().get(this.currentParticipant));
+        }
+        return Optional.empty();
+    }
+
+    protected Participant getCurrentParticipantOrThrow() {
+        return this.getCurrentParticipant().orElseThrow(() -> new IllegalStateException("Expected a current participant but none was found"));
     }
 
     public Set<ChessMove> getPotentialMoves() {
-        return this.getCurrentParticipant().getPotentialMoves();
+        return this.getCurrentParticipantOrThrow().getPotentialMoves();
     }
 
     public Optional<ChessMove> getPotentialMove(ChessBoard.Square from, ChessBoard.Square to) {
@@ -104,12 +111,12 @@ public class ChessGame {
         // execute the move
         move.execute();
         // notify the participant the move has been made
-        this.getCurrentParticipant().onMoveMade(move);
+        this.getCurrentParticipantOrThrow().onMoveMade(move);
         // update the move history
         this.moves.add(move);
         this.moveAccess = ImmutableList.copyOf(this.moves);
         // update the moves of the previous participant
-        this.getCurrentParticipant().scanPotentialMoves();
+        this.getCurrentParticipantOrThrow().scanPotentialMoves();
         // increment participant counter
         this.currentParticipant++;
         // increment turn counter if needed
@@ -122,17 +129,17 @@ public class ChessGame {
             this.status = ChessGameStatus.DRAW;
         } else {
             // scan the next participant's potential moves
-            Participant participant = this.getCurrentParticipant().scanPotentialMoves();
+            Participant participant = this.getCurrentParticipantOrThrow().scanPotentialMoves();
             if (participant.getPotentialMoves().isEmpty()) {
                 // if there are no moves remaining, the game is over
-                if (this.getCurrentParticipant().isMated()) {
+                if (this.getCurrentParticipantOrThrow().isMated()) {
                     this.status = ChessGameStatus.MATE;
                 } else {
                     this.status = ChessGameStatus.STALEMATE;
                 }
             } else {
                 // the game continues, start the turn of the next participant
-                this.getCurrentParticipant().startTurn();
+                this.getCurrentParticipantOrThrow().startTurn();
             }
         }
     }
