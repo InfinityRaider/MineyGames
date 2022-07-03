@@ -80,7 +80,7 @@ public class King extends ChessPiece.Type {
         int x = kingSquare.getX();
         int y = kingSquare.getY();
         int count = 0;
-        while(x != rookSquare.getX() && y != rookSquare.getY()) {
+        while(x != rookSquare.getX() || y != rookSquare.getY()) {
             x += dx;
             y += dy;
             count += 1;
