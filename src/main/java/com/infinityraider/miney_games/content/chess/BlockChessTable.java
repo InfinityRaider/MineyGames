@@ -69,9 +69,9 @@ public class BlockChessTable extends BlockMineyGame<TileChessTable> {
     }
 
     public static class Size extends MineyGameSize {
-        private static final int TEX_SIZE = 96;
-        private static final int MARGIN = 4;
-        private static final int SQUARES = 8;
+        public static final int TEX_SIZE = 96;
+        public static final int MARGIN = 4;
+        public static final int SQUARES = 8;
 
         public Size(int width) {
             super(width, width);
@@ -114,10 +114,6 @@ public class BlockChessTable extends BlockMineyGame<TileChessTable> {
             double max = this.getBoardMax();
             double squareSize = (max - min)/SQUARES;
             return min + squareSize*(1 + square);
-        }
-
-        public double getPieceScale() {
-            return this.getSquareSize()*(TEX_SIZE - 2*MARGIN + 0.0)/(TEX_SIZE);
         }
     }
 

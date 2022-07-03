@@ -41,29 +41,29 @@ public class ChessTableRenderer implements ITileRenderer<TileChessTable>, IRende
         // fetch the vertex builder
         VertexConsumer builder = buffer.getBuffer(RenderType.solid());
         // get the indices of the first square
-        int i_x0 = Math.max(0, tile.getSize().getSquareIndex(tile.getBlockPos().getX() - tile.getAbsX()));
-        int i_z0 = Math.max(0, tile.getSize().getSquareIndex(tile.getBlockPos().getZ() - tile.getAbsY()));
+        int i_x0 = Math.max(0, tile.getSize().getSquareIndex(Math.max(tile.getSize().getBoardMin(), tile.getAbsX())));
+        int i_z0 = Math.max(0, tile.getSize().getSquareIndex(Math.max(tile.getSize().getBoardMin(), tile.getAbsY())));
         // get the coordinates of the first square
         double x0 = tile.getSize().getSquareMin(i_x0);
         double z0 = tile.getSize().getSquareMin(i_z0);
         // calculate the step width
         double step = tile.getSize().getSquareSize();
         // get the scale factor
-        float scale = (float) tile.getSize().getPieceScale();
+        float scale = (float) step;
         // iterate over the squares until the bounds of the tile are exceeded, or all squares have been treated
-        for (int dx = 0; x0 + (dx + 0.5)*step <= 1 && i_x0 + dx < 8; dx++) {
-            for (int dz = 0; z0 + (dz + 0.5) * step <= 1 && i_z0 + dz < 8; dz++) {
+        for (int dx = 0; x0 + (dx + 0.5)*step - tile.getAbsX() < 1 && i_x0 + dx < 8; dx++) {
+            for (int dz = 0; z0 + (dz + 0.5) * step - tile.getAbsY() < 1 && i_z0 + dz < 8; dz++) {
                 // get absolute square indices
-                int xAbs = i_x0 + dx;
-                int yAbs = i_z0 + dz;
+                int i_xAbs = i_x0 + dx;
+                int i_yAbs = i_z0 + dz;
                 // calculate the relative indices
-                int xRel = tile.xAbsToRel(xAbs, yAbs);
-                int yRel = tile.yAbsToRel(xAbs, yAbs);
+                int i_xRel = tile.iAbsToRel(i_xAbs, i_yAbs);
+                int i_yRel = tile.jAbsToRel(i_xAbs, i_yAbs);
                 // calculate coordinates for the centre of the square
-                final double x = x0 + (dx + 0.5) * step;
-                final double z = z0 + (dz + 0.5) * step;
+                final double x = tile.getSize().getBoardMin() + (i_xAbs + 0.5) * step - tile.getAbsX();
+                final double z = tile.getSize().getBoardMin() + (i_yAbs + 0.5) * step - tile.getAbsY();
                 // check if there is a piece
-                tile.getWrapper().getPiece(xRel, yRel).ifPresent(piece -> {
+                tile.getWrapper().getPiece(i_xRel, i_yRel).ifPresent(piece -> {
                     // fetch the model
                     BakedModel model = this.getModelManager().getModel(ModelHandler.getChessModel(piece));
                     // push pose
@@ -122,22 +122,22 @@ public class ChessTableRenderer implements ITileRenderer<TileChessTable>, IRende
                 return new int[]{iX, iZ};
             }).orElse(NO_HIGHLIGHT);
             // get the indices of the first square
-            int x0 = Math.max(0, tile.getSize().getSquareIndex(tile.getBlockPos().getX() - tile.getAbsX()));
-            int z0 = Math.max(0, tile.getSize().getSquareIndex(tile.getBlockPos().getZ() - tile.getAbsY()));
+            int i_x0 = Math.max(0, tile.getSize().getSquareIndex(Math.max(tile.getSize().getBoardMin(), tile.getAbsX())));
+            int i_z0 = Math.max(0, tile.getSize().getSquareIndex(Math.max(tile.getSize().getBoardMin(), tile.getAbsY())));
             // calculate the step width
             double step = tile.getSize().getSquareSize();
             // iterate over the squares until the bounds of the tile are exceeded, or all squares have been treated
-            for (int dx = 0; step * dx <= 1 && x0 + dx < 8; dx++) {
-                for (int dz = 0; step * dz <= 1 && z0 + dz < 8; dz++) {
+            for (int dx = 0; tile.getSize().getSquareMin(i_x0 + dx) < tile.getAbsX() + 1 && i_x0 + dx < 8; dx++) {
+                for (int dz = 0; tile.getSize().getSquareMin(i_z0 + dz) < tile.getAbsY() + 1 && i_z0 + dz < 8; dz++) {
                     // get absolute square indices
-                    int xAbs = x0 + dx;
-                    int yAbs = z0 + dz;
+                    int i_xAbs = i_x0 + dx;
+                    int i_yAbs = i_z0 + dz;
                     // calculate the relative indices
-                    int xRel = tile.xAbsToRel(xAbs, yAbs);
-                    int yRel = tile.yAbsToRel(xAbs, yAbs);
+                    int i_xRel = tile.iAbsToRel(i_xAbs, i_yAbs);
+                    int i_yRel = tile.jAbsToRel(i_xAbs, i_yAbs);
                     // fetch the highlight colour
-                    participant.getHighLightColour(xRel, yRel, xAbs == hovered[0] && yAbs == hovered[1]).ifPresent(colour ->
-                            this.highLightSquare(tile, xAbs, yAbs, transforms, buffer, colour.getX(), colour.getY(), colour.getZ())
+                    participant.getHighLightColour(i_xRel, i_yRel, i_xAbs == hovered[0] && i_yAbs == hovered[1]).ifPresent(colour ->
+                            this.highLightSquare(tile, i_xAbs, i_yAbs, transforms, buffer, colour.getX(), colour.getY(), colour.getZ())
                     );
                 }
             }

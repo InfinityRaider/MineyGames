@@ -96,6 +96,14 @@ public class TileChessTable extends TileMineyGame<BlockChessTable, ChessGameWrap
         return new RenderFactory();
     }
 
+    public int iAbsToRel(int iAbs, int jAbs) {
+        return this.getOrientation().xAbsToRel(iAbs, jAbs, BlockChessTable.Size.SQUARES, BlockChessTable.Size.SQUARES);
+    }
+
+    public int jAbsToRel(int iAbs, int jAbs) {
+        return this.getOrientation().yAbsToRel(iAbs, jAbs, BlockChessTable.Size.SQUARES, BlockChessTable.Size.SQUARES);
+    }
+
     @Override
     public Component getDisplayName() {
         return NAME;
