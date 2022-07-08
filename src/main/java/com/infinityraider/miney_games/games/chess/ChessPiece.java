@@ -5,10 +5,7 @@ import com.google.common.collect.Sets;
 import com.infinityraider.miney_games.games.chess.pieces.*;
 import org.apache.commons.compress.utils.Lists;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ChessPiece {
@@ -18,7 +15,6 @@ public class ChessPiece {
 
     private ChessBoard.Square square;
     private final List<ChessMove> moves;
-    private final Set<ChessMove> potentialMoves;
     private boolean isCaptured;
     private boolean attacked;
 
@@ -28,7 +24,6 @@ public class ChessPiece {
         this.type = type;
         this.square = square;
         this.moves = Lists.newArrayList();
-        this.potentialMoves = Sets.newIdentityHashSet();
         this.isCaptured = false;
     }
 
@@ -101,18 +96,21 @@ public class ChessPiece {
     }
 
     protected Set<ChessMove> scanPotentialMoves() {
-        this.potentialMoves.clear();
+        if(this.isCaptured()) {
+            return Collections.emptySet();
+        }
+        Set<ChessMove> moves = Sets.newIdentityHashSet();
         this.getType().getPotentialMoves(this).stream()
                 .peek(move -> {
                     if(move.hasCaptures()) {
                         move.getCaptures().forEach(ChessPiece::setAttacked);
                     }})
-                .forEach(this.potentialMoves::add);
-        return this.getPotentialMoves();
+                .forEach(moves::add);
+        return moves;
     }
 
     public Set<ChessMove> getPotentialMoves() {
-        return this.potentialMoves;
+        return this.getGame().getPotentialMoves(this);
     }
 
     private void setAttacked() {

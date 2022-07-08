@@ -78,15 +78,17 @@ public class ChessGame {
         return this.getCurrentParticipant().orElseThrow(() -> new IllegalStateException("Expected a current participant but none was found"));
     }
 
-    public Set<ChessMove> getPotentialMoves() {
-        return this.getCurrentParticipantOrThrow().getPotentialMoves();
+    public Set<ChessMove> getPotentialMoves(ChessPiece piece) {
+        return this.getParticipant(piece.getColour()).getPotentialMoves(piece);
     }
 
     public Optional<ChessMove> getPotentialMove(ChessBoard.Square from, ChessBoard.Square to) {
-        return this.getPotentialMoves().stream()
-                .filter(move -> move.fromSquare().equals(from))
-                .filter(move -> move.toSquare().equals(to))
-                .findAny();
+        return from.getPiece().flatMap(piece ->
+                this.getPotentialMoves(piece).stream()
+                        .filter(move -> move.fromSquare().equals(from))
+                        .filter(move -> move.toSquare().equals(to))
+                        .findAny()
+        );
     }
 
     protected void onTimeUp(Participant participant) {
@@ -130,13 +132,10 @@ public class ChessGame {
         } else {
             // scan the next participant's potential moves
             Participant participant = this.getCurrentParticipantOrThrow().scanPotentialMoves();
-            if (participant.getPotentialMoves().isEmpty()) {
-                // if there are no moves remaining, the game is over
-                if (this.getCurrentParticipantOrThrow().isMated()) {
-                    this.status = ChessGameStatus.MATE;
-                } else {
-                    this.status = ChessGameStatus.STALEMATE;
-                }
+            if(participant.isMated()) {
+                this.status = ChessGameStatus.MATE;
+            } else if(participant.isStalemated()) {
+                this.status = ChessGameStatus.STALEMATE;
             } else {
                 // the game continues, start the turn of the next participant
                 this.getCurrentParticipantOrThrow().startTurn();
@@ -162,11 +161,12 @@ public class ChessGame {
         private final ChessColour colour;
 
         private final List<ChessMove> moves;
-        private final Set<ChessMove> potentialMoves;
         private final Map<String, Set<ChessPiece>> pieces;
+        private final Map<ChessPiece, Set<ChessMove>> potentialMoves;
         private final Set<ChessPiece> captured;
 
         private boolean mated;
+        private boolean stalemated;
         private boolean timeUp;
         private boolean resigned;
 
@@ -175,17 +175,18 @@ public class ChessGame {
             this.clock = clock.addCallback(this);
             this.colour = colour;
             this.moves = Lists.newArrayList();
-            this.potentialMoves = Sets.newIdentityHashSet();
+            this.potentialMoves = Maps.newIdentityHashMap();
             this.pieces = Maps.newHashMap();
             this.captured = Sets.newIdentityHashSet();
         }
 
         protected void addPiece(ChessPiece piece) {
             this.pieces.computeIfAbsent(piece.getName(), name -> Sets.newIdentityHashSet()).add(piece);
+            this.potentialMoves.put(piece, Sets.newIdentityHashSet());
         }
 
-        public Set<ChessMove> getPotentialMoves() {
-            return this.potentialMoves;
+        public Set<ChessMove> getPotentialMoves(ChessPiece piece) {
+            return this.potentialMoves.get(piece);
         }
 
         private void startTurn() {
@@ -195,7 +196,6 @@ public class ChessGame {
         private void onMoveMade(ChessMove move) {
             this.getClock().stop();
             this.moves.add(move);
-            this.potentialMoves.clear();
             if(move.hasCaptures()) {
                 move.getCaptures().forEach(this.captured::add);
             }
@@ -233,6 +233,10 @@ public class ChessGame {
             return this.mated;
         }
 
+        public boolean isStalemated() {
+            return this.stalemated;
+        }
+
         public boolean isTimeUp() {
             return this.timeUp;
         }
@@ -242,26 +246,32 @@ public class ChessGame {
         }
 
         protected Participant scanPotentialMoves() {
-            // clear the potential moves
-            this.potentialMoves.clear();
             // notify the pieces of the scan
             this.pieces.values().forEach(set -> set.forEach(ChessPiece::preMoveScan));
             // execute the scan
             this.getBoard().streamPieces()
                     .filter(piece -> piece.getColour() == this.getColour())
-                    .map(ChessPiece::scanPotentialMoves)
-                    .flatMap(Collection::stream)
-                    .filter(move -> {
-                        // simulate the move to check if a check is occurring
-                        move.execute();
-                        boolean check = this.isKingAttacked();
-                        move.undo();
-                        return !check;
-                    })
-                    .forEach(this.potentialMoves::add);
-            if(this.getPotentialMoves().isEmpty()) {
-                if(this.isKingAttacked()) {
+                    .forEach(piece -> {
+                        Set<ChessMove> moves = this.potentialMoves.get(piece);
+                        // clear the potential moves
+                        moves.clear();
+                        // scan new moves
+                        piece.scanPotentialMoves().stream()
+                                .filter(move -> {
+                                    // simulate the move to check if a check is occurring
+                                    move.execute();
+                                    boolean check = this.isKingAttacked();
+                                    move.undo();
+                                    return !check;
+                                }).forEach(moves::add);
+                        // update the moves in the map (for some reason this is necessary, I have no idea why)
+                        this.potentialMoves.put(piece, moves);
+                    });
+            if (!this.hasMoves()) {
+                if (this.isKingAttacked()) {
                     this.mated = true;
+                } else {
+                    this.stalemated = true;
                 }
             }
             return this;
@@ -273,6 +283,10 @@ public class ChessGame {
 
         public Set<ChessPiece> getCapturedPieces() {
             return this.captured;
+        }
+
+        public boolean hasMoves() {
+            return this.potentialMoves.values().stream().anyMatch(set -> !set.isEmpty());
         }
 
         public boolean isKingAttacked() {
