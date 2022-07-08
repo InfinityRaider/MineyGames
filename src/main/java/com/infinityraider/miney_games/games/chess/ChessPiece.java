@@ -1,12 +1,13 @@
 package com.infinityraider.miney_games.games.chess;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.infinityraider.miney_games.games.chess.pieces.*;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class ChessPiece {
     private final ChessGame game;
@@ -16,7 +17,6 @@ public class ChessPiece {
     private ChessBoard.Square square;
     private final List<ChessMove> moves;
     private boolean isCaptured;
-    private boolean attacked;
 
     public ChessPiece(ChessGame game, ChessColour colour, Type type, ChessBoard.Square square) {
         this.game = game;
@@ -92,29 +92,24 @@ public class ChessPiece {
     }
 
     public boolean isAttacked() {
-        return this.attacked;
+        return this.getGame().getParticipants().stream()
+                .filter(p -> !p.getColour().getName().equals(this.getColour().getName()))
+                .flatMap(p -> p.getPieces().stream())
+                .flatMap(piece -> piece.getPotentialMoves().stream())
+                .filter(move -> move.hasCaptures())
+                .flatMap(move -> move.getCaptures())
+                .anyMatch(piece -> piece == this);
     }
 
     protected Set<ChessMove> scanPotentialMoves() {
         if(this.isCaptured()) {
             return Collections.emptySet();
         }
-        Set<ChessMove> moves = Sets.newIdentityHashSet();
-        this.getType().getPotentialMoves(this).stream()
-                .peek(move -> {
-                    if(move.hasCaptures()) {
-                        move.getCaptures().forEach(ChessPiece::setAttacked);
-                    }})
-                .forEach(moves::add);
-        return moves;
+        return this.getType().getPotentialMoves(this);
     }
 
     public Set<ChessMove> getPotentialMoves() {
         return this.getGame().getPotentialMoves(this);
-    }
-
-    private void setAttacked() {
-        this.attacked = true;
     }
 
     void onMove(ChessMove move) {
@@ -134,10 +129,6 @@ public class ChessPiece {
 
     protected void setSquare(ChessBoard.Square square) {
         this.square = square;
-    }
-
-    protected void preMoveScan() {
-        this.attacked = false;
     }
 
     @Override

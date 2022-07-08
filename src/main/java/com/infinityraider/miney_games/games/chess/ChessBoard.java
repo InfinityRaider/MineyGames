@@ -105,6 +105,11 @@ public class ChessBoard {
             public Optional<Square> offset(ChessBoard board, PlayDirection direction, int mul) {
                 return Optional.empty();
             }
+
+            @Override
+            public String toString() {
+                return "captured";
+            }
         };
 
         private final int x;

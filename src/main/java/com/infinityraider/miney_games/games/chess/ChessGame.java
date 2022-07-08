@@ -182,7 +182,9 @@ public class ChessGame {
 
         protected void addPiece(ChessPiece piece) {
             this.pieces.computeIfAbsent(piece.getName(), name -> Sets.newIdentityHashSet()).add(piece);
-            this.potentialMoves.put(piece, Sets.newIdentityHashSet());
+            if(!this.potentialMoves.containsKey(piece)) {
+                this.potentialMoves.put(piece, Sets.newIdentityHashSet());
+            }
         }
 
         public Set<ChessMove> getPotentialMoves(ChessPiece piece) {
@@ -246,8 +248,6 @@ public class ChessGame {
         }
 
         protected Participant scanPotentialMoves() {
-            // notify the pieces of the scan
-            this.pieces.values().forEach(set -> set.forEach(ChessPiece::preMoveScan));
             // execute the scan
             this.getBoard().streamPieces()
                     .filter(piece -> piece.getColour() == this.getColour())
@@ -275,6 +275,10 @@ public class ChessGame {
                 }
             }
             return this;
+        }
+
+        public Set<ChessPiece> getPieces() {
+            return this.potentialMoves.keySet();
         }
 
         public Set<ChessPiece> getPieces(ChessPiece.Type type) {
