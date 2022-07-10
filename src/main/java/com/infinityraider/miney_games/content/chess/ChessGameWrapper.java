@@ -26,6 +26,8 @@ import java.util.*;
 import java.util.List;
 
 public class ChessGameWrapper extends GameWrapper {
+    public static final int WAGER_SIZE = 7;
+
     private final TileChessTable table;
     private final Settings settings;
 
@@ -117,6 +119,7 @@ public class ChessGameWrapper extends GameWrapper {
             this.getPlayer2().onGameStarted();
             if(this.isServerSide()) {
                 new MessageChessGameStart.ToClient(this.getTable());
+                this.getTable().setChanged();
             }
         }
     }
@@ -192,6 +195,7 @@ public class ChessGameWrapper extends GameWrapper {
                     boolean moved = this.makeMove(move);
                     if(moved) {
                         new MessageSyncChessMove(this.getTable(), move);
+                        this.getTable().setChanged();
                     }
                     return moved;
                 })
@@ -228,6 +232,7 @@ public class ChessGameWrapper extends GameWrapper {
                 }
                 if(this.isServerSide()) {
                     new MessageChessPlayerResign.ToClient(this.getTable(), p1);
+                    this.getTable().setChanged();
                 }
             });
         }
@@ -350,7 +355,7 @@ public class ChessGameWrapper extends GameWrapper {
         public Participant(ChessGameWrapper game, boolean p1) {
             this.game = game;
             this.p1 = p1;
-            this.wagers = new Wager<>(game);
+            this.wagers = new Wager<>(game, WAGER_SIZE);
             this.state = PlayerState.EMPTY;
         }
 
@@ -414,6 +419,7 @@ public class ChessGameWrapper extends GameWrapper {
             }
             if(this.isServerSide()) {
                 new MessageChessPlayerSet.ToClient(this.getTable(), this.isPlayer1());
+                this.getTable().setChanged();
             }
         }
 
@@ -435,6 +441,7 @@ public class ChessGameWrapper extends GameWrapper {
                 }
                 if(this.isServerSide()) {
                     new MessageChessPlayerSet.ToClient(this.getTable(), this.isPlayer1(), id);
+                    this.getTable().setChanged();
                 }
             }
         }
@@ -657,7 +664,7 @@ public class ChessGameWrapper extends GameWrapper {
             tag.putInt(Names.NBT.X, this.selected == null ? -1 : this.selected.getX());
             tag.putInt(Names.NBT.Y, this.selected == null ? -1 : this.selected.getY());
             this.getState().toTag(tag);
-            tag.put(Names.NBT.WAGERS, this.getWagers().writeToNBT());
+            tag.put(Names.NBT.WAGERS, this.getWagers().serializeNBT());
             return tag;
         }
 
@@ -669,7 +676,7 @@ public class ChessGameWrapper extends GameWrapper {
             this.selected = this.getWrapper().getSquare(tag.getInt(Names.NBT.X), tag.getInt(Names.NBT.Y)).orElse(null);
             this.state = PlayerState.fromTag(tag);
             if(tag.contains(Names.NBT.WAGERS, Tag.TAG_COMPOUND)) {
-                this.getWagers().readFromNBT(tag.getCompound(Names.NBT.WAGERS));
+                this.getWagers().deserializeNBT(tag.getCompound(Names.NBT.WAGERS));
             } else {
                 this.getWagers().reset();
             }
